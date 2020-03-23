@@ -2,7 +2,7 @@ package ricochet.modele;
 
 public class Robot {
 
-	private static int ID = 0;
+	public static int ID = 0;
 	private Position position;
 	private int id;
 

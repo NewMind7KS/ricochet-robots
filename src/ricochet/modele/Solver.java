@@ -2,84 +2,101 @@ package ricochet.modele;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class Solver {
 
 	private ArrayList<Node> closedList;
 	private ArrayList<Node> openList;
 	private Board board;
+	private static final Logger logger = Logger.getLogger("solve.log");
 
 	public Solver(Board board) {
 		this.board = board;
 		closedList = new ArrayList<Node>();
 		openList = new ArrayList<Node>();
-		Position startPosition = board.getMainRobot().getPositionRobot();
-		Node start = new Node(startPosition.getX(), startPosition.getY(), board.distanceManhattan(), 0, null);
-		openList.add(start);
 	}
 
 	public ArrayList<Position> solve() {
-		ArrayList<Position> chemin = new ArrayList<Position>();
-		Position arrivee = board.getMainGoal().getPositionGoal();
-		boolean b = false;
-		while (!openList.isEmpty()) {
-//			System.out.println("\nOpen list " + openList);
-//			System.out.println("Closed list " + closedList);
-			Node f = Collections.min(openList);
-//			System.out.println("Min Node Open : " + f);
-			board.moveRobotToPosition(board.getMainRobot(), f.getPosition());
-			System.out.println("Position du robot sur le plateau " + board.getMainRobot().getPositionRobot());
-//			board.printBoard();
-			if (f.getPosition().equals(arrivee)) {
-				while (f.ancestor != null) {
-					chemin.add(f.getPosition());
-					f = f.ancestor;
-					System.out.println(chemin);
-				}
-				return chemin;
-			} else {
-				for (Position v : board.getAllMoves(f.getPosition())) {
-					System.out.println("\nEtude de la position " + v);
-					if (v.equals(f.getPosition())) {
-						continue;
-					}
-					Node vo = new Node(v, board.distanceManhattan(f.getPosition(), v), board.distanceManhattan(v), f);
-//					System.out.println("Création du noeud pour openList : " + vo);
-					b = false;
-					Node tmp = null;
-					for (Node cl : closedList) {
-						if (cl.x == vo.x && cl.y == vo.y && vo.value() < cl.value()) {
-							b = true;
-							tmp = cl;
-						}
-					}
-					if (b)
-						closedList.remove(tmp);
-					if (!b) {
-						for (Node cl : openList) {
-							if (cl.x == vo.x && cl.y == vo.y && vo.value() < cl.value()) {
-								b = true;
-								tmp = cl;
-							}
-						}
-						if (b)
-							openList.remove(tmp);
-					}
-					if (!b) {
-						openList.add(vo);
-					}
-				}
-				openList.remove(f);
-				closedList.add(f);
-			}
-		}
-		System.err.println("Solve error");
-		return null;
-	}
+		logger.info("Démarrage de la résolution du jeu");
+		closedList.clear();
+		openList.clear();
 
-	@Override
-	public String toString() {
-		return "Solver [closedList=" + closedList + ", openList=" + openList + ", board=" + board + "]";
+		// Position de départ des mouvements et position cible
+		Position startPosition = board.getMainRobot().getPositionRobot();
+		Position arrivee = board.getMainGoal().getPositionGoal();
+		logger.info("\nPosition de départ : " + startPosition + "\nPosition d'arrivée : " + arrivee);
+
+		// Création du noeud de base
+		Node start = new Node(startPosition.getX(), startPosition.getY(), board.distanceManhattan(), 0, null);
+		openList.add(start);
+
+		boolean insert = false;
+		// Tant qu'un chemin est possible, on itère
+		while (!openList.isEmpty()) {
+			// Récupération duy noeud avec la valeur la plus basse
+			Node minNode = Collections.min(openList);
+//			logger.info("Noeud min de openList : " + minNode);
+
+			// Effectue le déplacement du robot lié à la position du noeud
+			board.moveRobotToPosition(board.getMainRobot(), minNode.getPosition());
+
+			// Si le noeud correspond à l'arrivée : algorithme terminé, reconstitution du
+			// chemin
+			if (minNode.getPosition().equals(arrivee)) {
+				ArrayList<Position> chemin = new ArrayList<Position>();
+				while (minNode.ancestor != null) {
+					chemin.add(minNode.getPosition());
+					minNode = minNode.ancestor;
+				}
+				System.out.println(chemin);
+				return chemin;
+			}
+			// Si ce n'est pas l'arrivée, on ajoute tous les enfants noeuds dans openList si
+			// ils ne sont pas dans closedList ou s'ils n'existent pas dans openList avec
+			// une valeur inférieure.
+			for (Position move : board.getAllMoves(minNode.getPosition())) {
+				// Vérification non retour en arrière
+				if (move.equals(minNode.getPosition())) {
+					continue;
+				}
+//				logger.info("Étude de la position : " + move);
+				// Création du nouveau noeud, sa position est la position d'arrivée après
+				// mouvement. Le cout d'un noeud est la distance de Manhattan entre son
+				// prédécesseur et lui-même. Quand à l'heuristique du noeud, c'est sa distance
+				// de Manhattan avec la cible principale.
+				Node nodeMove = new Node(move, board.distanceManhattan(minNode.getPosition(), move),
+						board.distanceManhattan(move), minNode);
+//				logger.info("Création du noeud associé : " + nodeMove);
+
+				insert = false;
+				// Si le nodeMove à une valeur plus basse que le même noeud dans closed, on peut
+				// l'ajouter à open
+				for (Node n : closedList) {
+					if (n.x == nodeMove.x && n.y == nodeMove.y) {
+						insert = true;
+						break;
+					}
+				}
+				Node nodeMax = null;
+				for (Node n : openList) {
+					if (n.x == nodeMove.x && n.y == nodeMove.y && nodeMove.value() < n.value()) {
+						insert = true;
+						nodeMax = n;
+						break;
+					}
+				}
+				if (!insert)
+					openList.add(nodeMove);
+				if (nodeMax != null) {
+					openList.remove(nodeMax);
+				}
+			}
+			openList.remove(minNode);
+			closedList.add(minNode);
+		}
+		logger.warning("Solve error, no path to complete");
+		return null;
 	}
 
 	class Node implements Comparable<Node> {

@@ -19,6 +19,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	private JButton printBoard;
 	private JButton test;
 	private JButton test2;
+	private JButton reset;
 
 	public VueMenu(Board board) {
 		this.setLayout(new GridLayout(10, 2));
@@ -33,9 +34,13 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		test2 = new JButton("A*");
 		test2.addActionListener(new ActionButton());
 		add(test2);
+		reset = new JButton("Reset Board");
+		reset.addActionListener(new ActionButton());
+		add(reset);
 		printBoard.setFocusable(false);
 		test.setFocusable(false);
 		test2.setFocusable(false);
+		reset.setFocusable(false);
 	}
 
 	@Override
@@ -50,10 +55,11 @@ public class VueMenu extends JPanel implements EcouteurModele {
 			if (ae.getSource() == printBoard)
 				board.printBoard();
 			else if (ae.getSource() == test)
-				board.writeBoard("testBoard.txt");
-			else if (ae.getSource() == test2) {
+				board.writeBoard("Board.txt");
+			else if (ae.getSource() == test2)
 				new Solver(board).solve();
-			}
+			else if(ae.getSource() == reset)
+				board.reload();
 		}
 	}
 }

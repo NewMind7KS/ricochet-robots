@@ -19,63 +19,14 @@ public class Board extends AbstractModeleEcoutable {
 	private ArrayList<Goal> goals;
 	private Robot mainRobot;
 	private Goal mainGoal;
+	private String filename;
 
 	public Board(String filename) {
+		this.filename = filename;
 		this.robots = new ArrayList<Robot>();
 		this.goals = new ArrayList<Goal>();
 		this.cases = new Case[16][16];
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				cases[i][j] = new Case();
-			}
-		}
-		try {
-			BufferedReader file = new BufferedReader(new FileReader(new File("./" + filename)));
-			String line = "";
-			int nLine = 0;
-			int x, y;
-			while ((line = file.readLine()) != null) {
-				nLine++;
-				String[] values = line.split(" ");
-				if (values.length < 2) {
-					System.err.println("Erreur sur la ligne " + nLine);
-					break;
-				}
-				try {
-					x = Integer.valueOf(values[0]);
-					y = Integer.valueOf(values[1]);
-				} catch (NumberFormatException ne) {
-					System.err.println("Bad index on line " + nLine);
-					break;
-				}
-				for (String s : values) {
-					switch (s) {
-					case "N":
-						addSimpleWall(x, y, Direction.N);
-						break;
-					case "S":
-						addSimpleWall(x, y, Direction.S);
-						break;
-					case "E":
-						addSimpleWall(x, y, Direction.E);
-						break;
-					case "W":
-						addSimpleWall(x, y, Direction.W);
-						break;
-					case "R":
-						robots.add(new Robot(new Position(x, y)));
-						break;
-					case "G":
-						goals.add(new Goal(new Position(x, y)));
-						break;
-					}
-				}
-			}
-			file.close();
-		} catch (IOException e) {
-			System.err.println("Erreur lors de la lecture du fichier " + filename);
-		}
-		notifyListener();
+		reload();
 	}
 
 	public Robot takeRobot() {
@@ -195,13 +146,11 @@ public class Board extends AbstractModeleEcoutable {
 				cases[x][y + 1].setWall(Direction.W);
 			break;
 		}
-		notifyListener();
 	}
-	
+
 	public void addSimpleWall(int x, int y, Direction dir) {
 		if (x < height && y < width && x >= 0 && y >= 0)
 			cases[x][y].setWall(dir);
-		notifyListener();
 	}
 
 	public void printBoard() {
@@ -292,7 +241,7 @@ public class Board extends AbstractModeleEcoutable {
 		}
 		return directions;
 	}
-	
+
 	public ArrayList<Position> getAllMoves(Position position) {
 		ArrayList<Position> directions = new ArrayList<Position>();
 		for (Direction d : Direction.values()) {
@@ -363,17 +312,22 @@ public class Board extends AbstractModeleEcoutable {
 		return str;
 	}
 
+	/**
+	 * Distance de Manhattan entre le robot principal et la cible principale
+	 * 
+	 * @return Distance de Manhattan entre le robot principal et la cible principale
+	 */
 	public int distanceManhattan() {
 		Position r = mainRobot.getPositionRobot();
 		Position g = mainGoal.getPositionGoal();
 		return distanceManhattan(r, g);
 	}
-	
+
 	public int distanceManhattan(Position r) {
 		Position g = mainGoal.getPositionGoal();
 		return distanceManhattan(r, g);
 	}
-	
+
 	public int distanceManhattan(Position r, Position g) {
 		return Math.abs(r.getX() - g.getX()) + Math.abs(r.getY() - g.getY());
 	}
@@ -416,6 +370,69 @@ public class Board extends AbstractModeleEcoutable {
 			System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
+	}
+
+	public void reload() {
+		robots.clear();
+		goals.clear();
+		Robot.ID = 0;
+		Goal.ID = 0;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				cases[i][j] = new Case();
+			}
+		}
+		try {
+			BufferedReader file = new BufferedReader(new FileReader(new File("./" + this.filename)));
+			String line = "";
+			int nLine = 0;
+			int x, y;
+			while ((line = file.readLine()) != null) {
+				nLine++;
+				String[] values = line.split(" ");
+				if (values.length < 2) {
+					System.err.println("Erreur sur la ligne " + nLine);
+					break;
+				}
+				try {
+					x = Integer.valueOf(values[0]);
+					y = Integer.valueOf(values[1]);
+					if (x < 0 || y < 0 || x > 15 || y > 15)
+						new NumberFormatException();
+				} catch (NumberFormatException ne) {
+					System.err.println("Bad index on line " + nLine);
+					break;
+				}
+				for (String s : values) {
+					switch (s) {
+					case "N":
+						addSimpleWall(x, y, Direction.N);
+						break;
+					case "S":
+						addSimpleWall(x, y, Direction.S);
+						break;
+					case "E":
+						addSimpleWall(x, y, Direction.E);
+						break;
+					case "W":
+						addSimpleWall(x, y, Direction.W);
+						break;
+					case "R":
+						robots.add(new Robot(new Position(x, y)));
+						break;
+					case "G":
+						goals.add(new Goal(new Position(x, y)));
+						break;
+					}
+				}
+			}
+			file.close();
+		} catch (IOException e) {
+			System.err.println("Erreur lors de la lecture du fichier " + filename);
+		}
+		takeRobot();
+		takeGoal();
+		notifyListener();
 	}
 
 }
