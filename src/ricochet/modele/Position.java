@@ -1,15 +1,33 @@
 package ricochet.modele;
 
+/**
+ * Classe définissant une position sur un plan à deux dimensions. Deux
+ * coordonnées en x et y.
+ */
 public class Position {
 
+	/** Position x : abscisse */
 	private int x;
+
+	/** Position y : ordonnée */
 	private int y;
 
+	/**
+	 * Création d'une position de coordonnées (x,y).
+	 * 
+	 * @param x Position x
+	 * @param y Position y
+	 */
 	public Position(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
 
+	/**
+	 * Création d'une position copie d'une autre position.
+	 * 
+	 * @param p Position copiée.
+	 */
 	public Position(Position p) {
 		this.x = p.getX();
 		this.y = p.getY();

@@ -28,7 +28,7 @@ public class Solver {
 		logger.info("\nPosition de départ : " + startPosition + "\nPosition d'arrivée : " + arrivee);
 
 		// Création du noeud de base
-		Node start = new Node(startPosition.getX(), startPosition.getY(), board.distanceManhattan(), 0, null);
+		Node start = new Node(startPosition.getX(), startPosition.getY(), 0, board.distanceManhattan(), null);
 		openList.add(start);
 
 		boolean insert = false;
@@ -50,16 +50,13 @@ public class Solver {
 					minNode = minNode.ancestor;
 				}
 				System.out.println(chemin);
+				board.moveRobotToPosition(board.getMainRobot(), startPosition);
 				return chemin;
 			}
 			// Si ce n'est pas l'arrivée, on ajoute tous les enfants noeuds dans openList si
 			// ils ne sont pas dans closedList ou s'ils n'existent pas dans openList avec
 			// une valeur inférieure.
 			for (Position move : board.getAllMoves(minNode.getPosition())) {
-				// Vérification non retour en arrière
-				if (move.equals(minNode.getPosition())) {
-					continue;
-				}
 //				logger.info("Étude de la position : " + move);
 				// Création du nouveau noeud, sa position est la position d'arrivée après
 				// mouvement. Le cout d'un noeud est la distance de Manhattan entre son
@@ -80,14 +77,15 @@ public class Solver {
 				}
 				Node nodeMax = null;
 				for (Node n : openList) {
-					if (n.x == nodeMove.x && n.y == nodeMove.y && nodeMove.value() < n.value()) {
+					if (n.x == nodeMove.x && n.y == nodeMove.y && nodeMove.value() > n.value()) {
 						insert = true;
 						nodeMax = n;
 						break;
 					}
 				}
-				if (!insert)
+				if (!insert) {
 					openList.add(nodeMove);
+				}
 				if (nodeMax != null) {
 					openList.remove(nodeMax);
 				}
@@ -95,7 +93,18 @@ public class Solver {
 			openList.remove(minNode);
 			closedList.add(minNode);
 		}
-		logger.warning("Solve error, no path to complete");
+		/*
+		 * A ce moment, il n'y a pas de chemin direct pour le robot pour se rendre sur
+		 * la cible. Il faut don cutiliser les autres robots. Mais utiliser les autres
+		 * robots : 
+		 * - Faire bouger le plus proche de la cible ? Et relancer a* 
+		 * - Ajouterdans l'algo toutes les positions possibles de tous les robots (donc revoir
+		 * 		l'évaluation des noeuds) 
+		 * - Jouer un robot au hasard puis relancer a* : mauvaise idée 
+		 * - Faire bouger un robot proche de celui du joueur ?
+		 */
+		logger.warning("Solve error, no direct path to complete");
+		board.moveRobotToPosition(board.getMainRobot(), startPosition);
 		return null;
 	}
 
@@ -107,6 +116,21 @@ public class Solver {
 		private int heuristique;
 		private Node ancestor;
 
+		/**
+		 * Noeud de l'algorithme A*, un Noeud est une future position sur le plateau de
+		 * Jeu pour le robot principal. Pour se rendre à ce noeud à partir de la
+		 * position actuelle, c'est sa distance qui le sépare de son ancètre.
+		 * L'heuristique est la distance de cette position à l'emplacement de la cible
+		 * principale sur le plateau.
+		 * 
+		 * @param x           Position x
+		 * @param y           Position y
+		 * @param cout        Cout de se rendre sur ce noeud depuis son ancètre
+		 *                    (distance)
+		 * @param heuristique Distance entre ce noeud et la position de la cible sur le
+		 *                    plateau
+		 * @param ancestor    Ancètre qui à permis d'accéder à ce noeud.
+		 */
 		public Node(int x, int y, int cout, int heuristique, Node ancestor) {
 			this.x = x;
 			this.y = y;
@@ -123,6 +147,12 @@ public class Solver {
 			return new Position(x, y);
 		}
 
+		/**
+		 * La valeur d'un Noeud est la sommme des couts qui ont permis de l'atteindre
+		 * plus son heuristique.
+		 * 
+		 * @return Valeur du Noeud courant
+		 */
 		public int value() {
 			int value = 0;
 			Node tmp = this;
@@ -139,6 +169,13 @@ public class Solver {
 					+ ancestor + ", value()=" + value() + "]";
 		}
 
+		/**
+		 * Comparaison entre deux Noeuds, c'est la valeur du Noeud qui fait office de
+		 * comparateur.
+		 * 
+		 * @param n Noeud à comparer
+		 * @return 0 Si noeuds égaux, -1 si n est plus petit et >0 si plus grand.
+		 */
 		@Override
 		public int compareTo(Node n) {
 			int value = value();

@@ -13,7 +13,6 @@ public class Start {
 		b.printBoard();
 		System.out.println(b.getMainRobot().getPositionRobot());
 		new Solver(b).solve();
-		//new Solver(b).test();
 	}
 
 }
