@@ -2,6 +2,8 @@ package ricochet.modele;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 public class Solver {
@@ -18,6 +20,15 @@ public class Solver {
 	}
 
 	public ArrayList<Position> solve() {
+		ArrayList<Position> ast = astar();
+		if (ast != null) {
+			return ast;
+		}
+		addMoves(3);
+		return null;
+	}
+
+	public ArrayList<Position> astar() {
 		logger.info("Démarrage de la résolution du jeu");
 		closedList.clear();
 		openList.clear();
@@ -96,16 +107,39 @@ public class Solver {
 		/*
 		 * A ce moment, il n'y a pas de chemin direct pour le robot pour se rendre sur
 		 * la cible. Il faut don cutiliser les autres robots. Mais utiliser les autres
-		 * robots : 
-		 * - Faire bouger le plus proche de la cible ? Et relancer a* 
-		 * - Ajouterdans l'algo toutes les positions possibles de tous les robots (donc revoir
-		 * 		l'évaluation des noeuds) 
-		 * - Jouer un robot au hasard puis relancer a* : mauvaise idée 
-		 * - Faire bouger un robot proche de celui du joueur ?
+		 * robots : - Faire bouger le plus proche de la cible ? Et relancer a* -
+		 * Ajouterdans l'algo toutes les positions possibles de tous les robots (donc
+		 * revoir l'évaluation des noeuds) - Jouer un robot au hasard puis relancer a* :
+		 * mauvaise idée - Faire bouger un robot proche de celui du joueur ?
 		 */
 		logger.warning("Solve error, no direct path to complete");
 		board.moveRobotToPosition(board.getMainRobot(), startPosition);
 		return null;
+	}
+
+	public void addMoves(int c) {
+		HashMap<Position, Robot> moves = new HashMap<Position, Robot>();
+		for (Robot r : board.getRobots()) {
+			if (r == board.getMainRobot())
+				continue;
+			for (Position p : board.getAllMoves(r)) {
+				moves.put(p, r);
+			}
+		}
+		for (Entry<Position, Robot> entry : moves.entrySet()) {
+			System.out.println(entry.getKey() + " = " + entry.getValue());
+			Position oldPosition = entry.getValue().getPositionRobot();
+			board.moveRobotToPosition(entry.getValue(), entry.getKey());
+			if (astar() != null) {
+				System.err.println("Solution trouvée");
+				System.out.println(astar());
+				return;
+			} else {
+				if (c != 0)
+					addMoves(c - 1);
+				board.moveRobotToPosition(entry.getValue(), oldPosition);
+			}
+		}
 	}
 
 	class Node implements Comparable<Node> {
