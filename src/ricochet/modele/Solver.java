@@ -12,6 +12,7 @@ public class Solver {
 	private ArrayList<Node> openList;
 	private Board board;
 	private static final Logger logger = Logger.getLogger("solve.log");
+	private ArrayList<ArrayList<Position> > allPossibilities= new ArrayList<ArrayList<Position> >();
 
 	public Solver(Board board) {
 		this.board = board;
@@ -60,7 +61,7 @@ public class Solver {
 					chemin.add(minNode.getPosition());
 					minNode = minNode.ancestor;
 				}
-				System.out.println(chemin);
+				System.out.println("Chemin : " + chemin);
 				board.moveRobotToPosition(board.getMainRobot(), startPosition);
 				return chemin;
 			}
@@ -132,7 +133,27 @@ public class Solver {
 			board.moveRobotToPosition(entry.getValue(), entry.getKey());
 			if (astar() != null) {
 				System.err.println("Solution trouvée");
-				System.out.println(astar());
+				//ajout solution
+				ArrayList<Position> possibility = astar();
+				allPossibilities.add(possibility);
+				//taille de allPossi
+				System.out.println("Taille allPossi : " + allPossibilities.size());
+				//taille de chaque élement dans allPossi
+				for (int i = 0; i < allPossibilities.size(); i++){
+					System.out.print("Taille de " + i + " élément de allPossi : " + allPossibilities.get(i).size()+" ");
+				}
+				//affichages diverses
+				System.out.println("affichage astar()/possibility"+possibility);
+				System.out.println("----BEST----");
+				int j= 50;
+				//choisi la taille minimale
+				for (int i = 0; i < allPossibilities.size(); i++){
+					if (allPossibilities.get(i).size() <  j){
+						j = i;
+					}
+				}
+				//affichage best
+				System.out.println("VOICI LE MEILLEUR : " + allPossibilities.get(j));
 				return;
 			} else {
 				if (c != 0)
