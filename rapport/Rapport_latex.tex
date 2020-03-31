@@ -119,32 +119,104 @@ Voici l'architecture de notre projet :
 
 
 
+
 \begin{figure}[h]
 \begin{center}
 \begin{tikzpicture}[dirtree]
+ 	    
 \node {src} 
-    child { node {XXX} }
-   ;
+    child { node {ricochet }
+    	child { node {gui}    		 
+    		child { node {RicochetGUI.java
+			} }
+    		child { node {Start.java
+			} }
+   			child { node {VueBoard.java
+			} }
+			child { node {VueCase.java
+			} }
+			child { node {VueMenu.java
+			} }
+    }    		
+    	child { node {modele}    		 
+    		child { node {Board.java
+			} }
+    		child { node {Case.java
+			} }
+   			child { node {Direction.java
+			} }
+			child { node {Goal.java
+			} }
+			child { node {Position.java
+			} }
+			child { node {Robot.java
+			} }
+			child { node {Solver.java
+			} }
+			child { node {Start.java
+			} }
+    }    
+    	child { node {util}    		 
+    		child { node {AbstractModeleEcoutable.java
+			} }
+    		child { node { EcouteurModele.java
+			} }
+   			child { node {ModeleEcoutable.java
+			} }				   
+   	    }}    	       	     
+    ;   
 \end{tikzpicture}
 \end{center}
 \caption{Arborescence des dossiers}
 \end{figure}
+\subsubsection{Architecture des modules et des classes}
+\begin{itemize}
+\item Le projet est reparti en trois  parties mais avec deux paquet majeur, nous avons la partie modèle dans le package "ricochet.modele" : 
 
+Au sein de cette partie ou de ce package nous retrouvons la classe "Board" qui est l'épicentre de notre projet, elle utilise l'ensemble des classes du projet afin de réutiliser tous ces éléments dans l’implémentation des fonctionnalités elle utilise plus ou moins l'intégralité des classes du package qui est composé notamment de la classe "Case" ,"Direction" ,"Goal" , "Position", "Robot" , "Solver" et enfin le main : "Start".Nous avons aussi dans ce package la classe  ou nous implémentons l'algorithme "Solver" elle utilise notamment la méthode de calcul de l'heuristique dans la classe "Board" ou encore le "getAllMoves" pour les mouvements des robots.
 
-\subsubsection{ CAS D’UTILISATION}
+\item La seconde partie est notamment la partie graphique composé des classes nous permettant d'avoir la vue du menu et l'affichage du plateau de jeu qui sont englobées dans la classe "RicochetGUI" qui réutilise les classes "VueCase", "VueBoard" et "VueMenu".
+\end{itemize}
+
 
 (………………… A COMPLÉTER ……………….)
 
 \subsubsection{CHAÎNES DE TRAITEMENT }
-
+Le traitement de données renvoie à une série de processus qui permettent d'extraire de l'information ou de produire un rendu a partir de données brutes.Dans le cas de notre projet le rendu est sous forme d'une interface graphique bien que certaines données peuvent être transcrites dans la console , ainsi le traitement se fait comme suit: à partir du main nous créons uniquement un nouvel objet de la classe "RicochetGUI", qui dans le traitement :
+Crée une fenêtre puis charge un plateau puis charge l'affichage de ce plateau , ensuite ajoute le menu a l'interface puis ajoute les écouteur afin de mettre à jour puis enfin affiche l'interface,par la suite le reste des opérations tel que les déplacements des robots , la sélection aléatoire de la cible principale est prise ainsi que l'algorithme de résolution se fait par le biais des classe "Board" et "Solver" du package "ricochet.modele" en utilisant aussi les autres classe du package.  
 (………………… A COMPLÉTER ……………….)
 
 
 \section{EXPÉRIMENTATIONS ET USAGES }
 \subsubsection{CAPTURES D’ÉCRANS }
+\begin{itemize}
+\item L'aspect final de notre application se présente comme tel :
 
+\begin{figure}
+
+\end{figure}
+
+
+\item Voici un exemple plateau a charger:
+
+\begin{figure}
+
+\end{figure}
+
+\item Voici comment se présente une fin de partie : 
+\begin{figure}
+
+\end{figure}
+
+\end{itemize}
+
+
+
+ 
 
 (………………… A COMPLÉTER ……………….)
+
+
 
 \subsubsection{ MESURES DE PERFORMANCES }
 
