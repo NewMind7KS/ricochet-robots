@@ -16,37 +16,123 @@
 \subsubsectionfont{\color{NavyBlue}}
 \usepackage{appendix} % Pour l'annexe
 
-
-\title{
-\LARGE{\em{Rapport Conception de Logiciels}}\\\vspace*{0.5cm}
+\title{\vspace*{5cm}
+\LARGE{\em{Rapport Conception logicielle avancée}}\\
+Solveur de Ricochet Robots\\\vspace*{0.5cm}
 UE Conception de Logiciels\\
 Licence Informatique
 }
 \author{
-Elie MALBEC - Alex LEFEVRE -  Yoann Kablan - Vouvou Brandon\\
-Groupe 1B\\
-Sujet : Optimisateur de Wargame
+Elie Malbec - Alex Lefevre -  Yoann Kablan - Vouvou Brandon\\
+Groupe 1B
 }
 
-\date{2018 - 2019}
+\date{2019 - 2020}
 
-\begin{document} %début du document
+\begin{document}
+\maketitle
 \newpage
-\newpage
-	\null % Page blanche après page de garde
-\newpage
-
 \tableofcontents
 \newpage
 
 \section{Introduction}
-Le choix du projet Ricochets Robots s'est fait par vote nous avons choisi ce projet a la suite d'un vote collectif des membres du groupe car aucun des sujets n'attirait tous les membres du groupe en même temps et comme la plupart des membres avaient plus ou moins envie .C'est donc ainsi que nous avons choisi ce projet.Ainsi il est nécessaire de se demander ce qu'est-ce que ricochet robot ? Ricochet Robots (Rasende Roboter pour la première édition en allemand) est un jeu de société créé par Alex Randolph et illustré par Franz VohwinkelLe jeu est composé d'un plateau, de tuiles représentant chacune une des cases du plateau, et de pions appelés  robots . La partie est décomposée en tours de jeu, un tour consistant à déplacer les robots sur un plateau et d'en amener un sur l'une des cases du plateau. Les robots se déplacent en ligne droite et avancent toujours jusqu'au premier mur qu'ils rencontrent. On peut aussi bien y jouer seul qu'à un grand nombre de participants.
+Dans le cadre de l'unité d'enseignement Conception Logicielle Avancée, nous avons formé un groupe de quatre étudiants : Alex Lefevre, Elie Malbec, Yoann Kablan, Brandon Vouvou pour créer un solveur de Ricochet Robots.
 
-\section{Objectifs du projet}	
-	\subsection{Ce qu’il fallait faire}
-L'objectif du projet  solveur de ricochet robots  est de réaliser un programme permettant de trouver une solution optimale pour toute situation du jeu sachant que le principe même du jeu est de trouver en moins d'une minute la séquence de mouvements qui permettra à un robot d'atteindre un objectif désigné sur une des cases du plateau de jeu.
-	\subsection{Ce qui existe déjà}
-(.......................)
+Le choix du sujet s'est fait naturellement, le concept du jeu et la réalisation d'un solveur nous ont motivés.
+
+Le langage de programmation imposé est le Java.
+
+\section{Description du jeu et des objectifs}
+	\subsection{Le jeu Ricochet Robot}
+Ricochet Robot est un jeu de plateau carré composé de pions robots et de tuiles objectifs. Le but est de trouver la séquence de mouvements nécessaires pour emmener le robot principal sur un objectif. Cependant, chaque déplacement ne peut se faire qu'en ligne droite jusqu'au prochain obstacle. Chaque case du plateau peut comporter des murs faisant office d'obstacle.
+
+Une partie démarre par le tirage au sort d'une cible parmi les dix-sept présentes sur le plateau. Un robot est également tiré, il devra se rendre sur cet objectif pour terminer le jeu.
+
+Il est possible de déplacer les trois autres robots pour arriver à la destination. Le but du jeu est de résoudre ce puzzle avec le moins de mouvements possible dans un temps limité. C'est également le but de notre projet.
+
+	\subsection{Objectif du solveur}
+L'objectif de la résolution du jeu est de minimiser le nombre de déplacements nécessaires pour permettre au robot principal de se rendre sur l'objectif. Plusieurs solutions permettent d'arriver au résultat mais certaines sont plus rapides.
+
+Nous avons ainsi développer une algorithme résolvant le puzzle et minimisant le nombre de coups suivant une complexité de calcul donnée. Toute situation de jeu permet de trouver une solution au problème.
+
+\section{Développement du moteur de jeu}
+	\subsection{Modèle physique}
+		\subsubsection{Le plateau de jeu}
+Le modèle physique du jeu repose sur un plateau découpé en 256 cases reparties sur 16 lignes et 16 colonnes. Ces cases comportent à la fois des murs qui bloquent les mouvements et des entités.
+Les murs sont situés dans les quatre directions cardinales et délimitent à la fois la terrain de jeu avec une bordure extérieure et forment des angles entre eux pour y placer les objectifs.
+Il y a quatre robots et dix-sept objectifs (cibles) sur la version officielle.
+
+Le terrain de jeu est en réalité découpé en quatre sous terrains de 8 lignes et 8 colonnes. Le placement de ces derniers et leur rotation apporte de nombreuses configurations de jeu, mais toujours solvables.
+
+Pour notre projet, nous nous sommes tenus de respecter la configuration du jeu officiel en utilisant quatre robots et dix-sept objectifs. Le plateau de jeu est quand à lui soit chargé depuis le plateau officiel, soit généré aléatoirement.
+
+		\subsubsection{Déplacements internes}
+Les déplacements des robots sur le plateau doivent suivre les quatre directions cardinales : Nord, Sud, Est et Ouest. Un robot ne peut se déplacer dans la case adjacente uniquement si aucun mur ne bloque le déplacement sur sa position mais également qu'aucun robot n'est présent sur la case adjacente.
+
+Un objectif sur une case ne constitue pas un obstacle pour un déplacement.
+
+Notons que bouger un robot permet de créer un nouvel obstacle à une certaine position du jeu pouvant aider à la résolution. À chaque robot déplacé, un mouvement supplémentaire est comptabilisé.
+
+	\subsection{Modèle informatique}
+		\subsubsection{Plateau du jeu}
+Pour le modèle informatique du plateau, nous avons développé une classe \texttt{Board}. Cette dernière est constituée de 256 cases et représente l'état actuel du jeu. Les entités sont représentées par des classes \texttt{Robot} et \texttt{Goal}. Chaque robot ou cible ne sont pas directement placés dans une case mais ils possèdent leur position sur le plateau de jeu sous forme de coordonnées $x$ et $y$.
+Les coordonnées dans le plateau suivent le graphique \ref{coordPlateau}.
+
+\begin{figure}[!h]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images/board.png}
+	\caption{Plateau de jeu sous forme de coordonnées}\label{coordPlateau}
+	\end{center}
+\end{figure}
+
+Les robots et les objectifs (cibles) sont stockées dans des listes avec la structure \texttt{ArrayList}. Des références au robot principal et à la cible principale permettent de les distinguer des autres.
+
+La construction du plateau de jeu est basée sur un fichier texte, il donne pour chaque coordonnée les murs et entités présentes (cf:\ref{structFichier}). Cette construction est par défaut basée sur celle du plateau de jeu officiel. Mais il est possible de générer un plateau aléatoirement ou de choisir un fichier de configuration.
+
+Voici le diagramme de classe donnant les principales méthodes utilisées sur le plateau mais également la structure des robots et cibles.
+
+\begin{figure}[!h]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images/boardwithentities.png}
+	\caption{Diagramme de classe du Board et des entités}
+	\end{center}
+\end{figure}
+
+Le plateau dispose de méthodes qui lui permettent de bouger les robots, de tester si le jeu est terminé mais aussi de tirer une nouvelle cible ou un nouveau robot. Les directions sont listées depuis une énumération et les positions représentés avec deux coordonnées pour un plan deux dimensions.
+
+Nous pouvons également remarquer que les 256 cases sont des objets \texttt{Case} stockées dans un double tableau. Cela permet un accès direct aux données mais aussi un parcours simplifié avec une largeur et une hauteur connue. La composition d'une case est la suivante :
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images/casediag.png}
+	\caption{Classe Case}
+	\end{center}
+\end{figure}
+
+Les quatre murs possibles sont par défaut désactivés puis activés avec la méthode \texttt{setWall} dans la direction donnée. Une fois les murs mis en place, ils ne changent plus durant la partie.
+
+		\subsubsection{Déplacements internes}
+Concernant les déplacements, les méthodes \texttt{moveRobot} et \texttt{getAllMoves} requiert des tests supplémentaires. Il faut vérifier que les déplacement sont valides et donner les position d'arrivée quand un obstacle est rencontré. Pour cela, des méthodes ont été implémentées dans la classe \texttt{Board} dont voici le diagramme :
+
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.5]{./images/boardMove.png}
+	\caption{Méthodes pour déplacements dans Board}
+	\end{center}
+\end{figure}
+
+Les déplacements sont ainsi possibles en donnant un robot et une direction à la méthode \texttt{moveRobot} et le déplacement est effectué. C'est à dire que la position d'arrivée est déterminée suivant la direction puis le robot concerné voit sa position modifiée.
+
+	\subsection{Visualisation d'un plateau de jeu}
+Pour permettre les tests et rendre le jeu plus visuel, une interface graphique à été développée en suivant le modèle Modèle Vue Contrôleur. Les murs sont représentés par des traits et les entités sont placées par rapport à leurs coordonnées respectives. Le robot principal est coloré en rouge et la cible principale en vert. Cette visualisation permet de mieux voir les données comparativement à une lecture descriptive sous forme textuelle.
+La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board}.
+
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.4]{./images/visuBoard.png}
+	\caption{Visualisation graphique du jeu}\label{visuBoard}
+	\end{center}
+\end{figure}
+
 
 \section{Fonctionnalités implémentées}
 
@@ -69,6 +155,7 @@ une valeur inférieure.Après on crée encore un nouveau nœud qui a comme posit
 (………………… A COMPLÉTER ……………….)
 
 \subsubsection{STRUCTURES DE DONNÉES }
+Structure du fichier contenant les données pour le chargement d'un plateau de jeu.\label{structFichier}
 
 (………………… A COMPLÉTER ……………….)
 
