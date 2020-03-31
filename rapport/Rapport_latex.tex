@@ -40,64 +40,123 @@ Sujet : Optimisateur de Wargame
 \newpage
 
 \section{Introduction}
-Le choix du projet Ricochets Robots s'est fait par vote nous avons choisi ce projet a la suite d'un vote collectif des membres du groupe car aucun des sujets n'attirait tous les membres du groupe en même temps et comme la plupart des membres avaient plus ou moins envie .C'est donc ainsi que nous avons choisi ce projet.Ainsi il est nécessaire de se demander ce qu'est-ce que ricochet robot ? Ricochet Robots (Rasende Roboter pour la première édition en allemand) est un jeu de société créé par Alex Randolph et illustré par Franz VohwinkelLe jeu est composé d'un plateau, de tuiles représentant chacune une des cases du plateau, et de pions appelés  robots . La partie est décomposée en tours de jeu, un tour consistant à déplacer les robots sur un plateau n'an d'en amener un sur l'une des cases du plateau. Les robots se déplacent en ligne droite et avancent toujours jusqu'au premier mur qu'ils rencontrent. On peut aussi bien y jouer seul qu'à un grand nombre de participants.
+Le choix du projet Ricochets Robots s'est fait par vote nous avons choisi ce projet a la suite d'un vote collectif des membres du groupe car aucun des sujets n'attirait tous les membres du groupe en même temps et comme la plupart des membres avaient plus ou moins envie .C'est donc ainsi que nous avons choisi ce projet.Ainsi il est nécessaire de se demander ce qu'est-ce que ricochet robot ? Ricochet Robots (Rasende Roboter pour la première édition en allemand) est un jeu de société créé par Alex Randolph et illustré par Franz VohwinkelLe jeu est composé d'un plateau, de tuiles représentant chacune une des cases du plateau, et de pions appelés  robots . La partie est décomposée en tours de jeu, un tour consistant à déplacer les robots sur un plateau et d'en amener un sur l'une des cases du plateau. Les robots se déplacent en ligne droite et avancent toujours jusqu'au premier mur qu'ils rencontrent. On peut aussi bien y jouer seul qu'à un grand nombre de participants.
 
 \section{Objectifs du projet}	
 	\subsection{Ce qu’il fallait faire}
-L'objectif du projet  solveur de ricochet robots  est de réaliser un programme permettant de trouver une solution optimale pour toute situation du jeu sachant que le principe même du jeu est de trouver en moins d'une minute la séquence de mouvements qui permettra à un robot d'atteindre un objectif désigné sur une des cases du plateau de jeu.
+L'objectif du projet  solveur de ricochet robots  est de réaliser un programme permettant de trouver une solution optimale pour toute situation du jeu sachant que le principe même du jeu est de trouver en moins d'une minute la séquence de mouvements qui permettra à un robot d'atteindre un objectif désigné sur une des cases du plateau de jeu.
 	\subsection{Ce qui existe déjà}
 (.......................)
 
 \section{Fonctionnalités implémentées}
 
 \subsection{DESCRIPTION  DES FONCTIONNALITÉS }
-Au cours du projet , de multiples fonctionnalités ont été implémentées...Pour commencer nous avons implémenté le jeu et sa structure c'est-à-dire le plateau et tous les éléments qui le constitue ce plateau sont un plateau de n*m objets de types cases qui ont (…) . Ce plateau est constitué de plusieurs éléments c'est-à-dire les murs qui sont placés de façon aléatoire ou chargé à partir d’un fichier ces murs sont comme toute logique non traversable et formant souvent des angles qui contiennent souvent ou pas des cibles . Ensuite nous avons implémenté les différentes entités du jeu : les robots qui sont dotés de plusieurs attributs dont la position  et l’identifiant ils ont aussi la possibilité de se déplacer en ligne droite uniquement  ensuite les cibles qui ont les mêmes attributs que les robots qui sont entre autres la position et l’identifiant ainsi dans le plateau de jeu une de ses cibles est considéré comme  l'objectif principal . Nous avons accompagné cela d’une interface graphique là où il est possible d'afficher le plateau présent dans la console, enregistrer le plateau  ensuite  d’exécuter l’algorithme A* et enfin de remettre à zéro le plateau. Notre jeu ne se joue pas en console bien qu’il soit possible d’afficher le plateau de jeu avec des robots et même des déplacements dans la console.puis enfin de l’algorithme de résolution A* qui partant de la position de départ d’un robot trouve les positions intermédiaires jusqu’à la résolution du jeu . 
+Au cours du projet , de multiples fonctionnalités ont été implémentées...Pour commencer nous avons implémenté le jeu et sa structure c'est-à-dire le plateau et tous les éléments qui le constitue ce plateau sont un plateau de n*m objets de types cases qui ont comme attribut quatre booléens qui sont ici nos murs. Ce plateau est constitué de plusieurs éléments c'est-à-dire les murs qui sont placés de façon aléatoire ou chargé à partir d’un fichier ces murs sont comme toute logique non traversable et formant souvent des angles qui contiennent souvent ou pas des cibles . Ensuite nous avons implémenté les différentes entités du jeu : les robots qui sont dotés de plusieurs attributs dont la position  et l’identifiant ils ont aussi la possibilité de se déplacer en ligne droite uniquement  ensuite les cibles qui ont les mêmes attributs que les robots qui sont entre autres la position et l’identifiant ainsi dans le plateau de jeu une de ses cibles est considéré comme  l'objectif principal . Nous avons accompagné cela d’une interface graphique là où il est possible d'afficher le plateau présent dans la console, enregistrer le plateau  ensuite  d’exécuter l’algorithme A* et enfin de remettre à zéro le plateau. Notre jeu ne se joue pas en console bien qu’il soit possible d’afficher le plateau de jeu avec des robots et même des déplacements dans la console.puis enfin de l’algorithme de résolution A* qui partant de la position de départ d’un robot trouve les positions intermédiaires jusqu’à la résolution du jeu . 
+
 
 		\subsubsection{ ORGANISATION DU PROJET 
 }
-L'organisation du projet s'est déroulée en plusieurs étapes importantes, la première concerne la structure du projet. Les premières séances ont été consacrées au choix du projet. Après cela fallait commencer par coder le plateau et les éléments qui le constituent Bien avant d’avoir commencé à coder ensemble le jeu  Élie avait déjà une implémentation du plateau de jeu, ainsi Lors de la deuxième séance de Tp nous avons commencé à coder le plateau et les éléments qui le constituent c'est-à-dire les murs et les autres entités nous créons alors la première version de notre  jeu ricochets robot qui était la version robot 1.1 travail qui fut validé par tous les membres du groupe.Par la suite Alex a avancé sur la structuration du plateau  pendant que Yoann et Élie  commençaient à implémenter les déplacements des robots et les possibilités de déplacements des robots dans le plateau . Après plusieurs implémentions et test nous avons réuni nos idées pour finaliser cela. Une première version du projet était fonctionnelle en console et permettait déjà de :  choisir la cible principale de façon aléatoire, de sélectionner le robot principal, d’effectuer des déplacements, de charger un plateau prédéfini, de générer un plateau avec des constituants placés aléatoirement tout en respectant les normes du jeu.Après cette phase, Nous nous sommes directement penchés sur l’interface graphique partie où les connaissances d’Alex nous ont beaucoup aidés. À partir de ce moment , le projet s’est scindé en deux parties : Alex travaillait sur l’interface pendant que le reste du groupe travaillait sur l’implémentation de l’algorithme A* .
-
+L'organisation du projet s'est déroulée en plusieurs étapes importantes, la première concerne la structure du projet. Les premières séances ont été consacrées au choix du projet. Après cela fallait commencer par coder le plateau et les éléments qui le constituent Bien avant d’avoir commencé à coder ensemble le jeu  Élie avait déjà une implémentation du plateau de jeu, ainsi Lors de la deuxième séance de Travaux pratiques  nous avons commencé à coder le plateau et les éléments qui le constituent c'est-à-dire les murs et les autres entités nous créons alors la première version de notre  jeu ricochets robot qui était la version robot 1.1 travail qui fut validé par tous les membres du groupe.Par la suite Alex a avancé sur la structuration du plateau  pendant que Yoann et Élie  commençaient à implémenter les déplacements des robots et les possibilités de déplacements des robots dans le plateau . Après plusieurs implémentions et test nous avons réuni nos idées pour finaliser cela. Une première version du projet était fonctionnelle en console et permettait déjà de :  choisir la cible principale de façon aléatoire, de sélectionner le robot principal, d’effectuer des déplacements, de charger un plateau prédéfini, de générer un plateau avec des constituants placés aléatoirement tout en respectant les normes du jeu.Après cette phase, Nous nous sommes directement penchés sur l’interface graphique partie où les connaissances d’Alex nous ont beaucoup aidés. À partir de ce moment , le projet s’est scindé en deux parties : Alex travaillait sur l’interface pendant que le reste du groupe travaillait sur l’implémentation de l’algorithme A* .
+Après cela , nous avons joint la partie graphique au modèle ainsi la deuxième version de notre jeu fut crée "Robot1.2".Après cela Elie et Yoann avait une ébauche de l'algorithme mais qui ne fonctionnait pas correctement,Alex et Brandon se sont ainsi penchés sur cette partie du travail et c'est comme sa que tous ensemble avons réussi a implémenter l'algorithme .
+Puis enfin Alex a proposé une nouvelle structure du code que nous avons adopté par la suite car nous la trouvons plus souple car elle simplifie et clarifie notre code. 
 (………………………………….)
 
 \section{ÉLÉMENTS  TECHNIQUE }	
 \subsubsection{ALGORITHMES}
+L'algorithme de résolution de notre jeux se nomme A*. C'est un algorithme de recherche de chemin dans un graphe entre un nœud initial et un nœud final tous les deux donnés.Cet algorithme fut crée par Peter E.Hart Nils John Nilso et Betram Raphael en 1968, cet algorithme est en réalité une extension de l'algorithme de Djikstra qui fut proposé en 1959 qui est aussi un algorithme de recherche.
+Dans le cas de notre ricochet robots il s'agissait de rechercher le chemin le plus court pour chaque robot d'arriver a la cible,ainsi le nœud de départ avait comme position un des robots du jeu  et le nœud final avait comme position la cible principale qui est l'objectif qui est tiré de façon aléatoire.Ainsi l'objectif est un objet de type "Goal" qui a comme attribut une position et un identifiant et qui est sélectionné dans la classe Board avec les méthodes takeGoal() et getMainGoal() qui réutilise la méthode précédente , ensuite nous avons une classe nommée Solver la ou nous implémentons l'algorithme.Comme l'algorithme le dit nous commençons d'abord par créer la liste ouverte et la liste fermée qui sont ici deux ArrayList d'objet de type "Node" qui sont des objets d'une classe interne dont les attributs sont: la position ,l'heuristique et le noeud ancêtre qui est le nœud qui a permis d’accéder au nœud actuel. Ainsi dans la classe "Board" nous calculons directement l'heuristique du nœud de départ qui serra utilisé par la suite dans l'algorithme.Pour commencer nous initialisons la position de départ qui est la position du robot a étudier et la position d'arrivée qui est la position de l'objectif , ensuite nous initialisons les nœuds de départ et d'arrivée puis nous initialisons une variable booléenne "insert" qui nous sert a (.............)  ,on récupère le nœud avec la plus petite valeur on le fait grâce a la méthode min qui est utilise pour renvoyer l'élément minimum d'une collection donnée, selon l'ordre induit par le comparateur spécifié,ainsi il est plus nécessaire de trier les éléments de la liste ouverte en ordre décroissant.Après on commence par itérer tant que le liste ouverte n'est pas vide en récupérant le nœud minimum de la liste puis on effectue le déplacement lié a la position du nœud étudié on itère jusqu’à ce que la position du nœud soit égal à la position de la cible dans la cas on ajoute tous les enfants du nœud étudié dans la liste fermé a la liste fermées en vérifiant que ces enfants ne sont pas dans la liste fermée ou s'ils n'existent pas dans la liste ouverte  avec
+une valeur inférieure.Après on crée encore un nouveau nœud qui a comme position la position du mouvement venant d’être effectué puis on compare sa valeur au même nœud dans la liste ouverte en vérifiant si sa valeur est plus basse dans la liste fermé si oui on l'ajoute a la liste ouverte. A partir du moment ou la liste ouverte est vide cela veut dire que : il n'y a pas de chemin possible pour le robot pour se rendre sur la cible.
+(………………… A COMPLÉTER ……………….)
 
-(………………………………….)
 \subsubsection{STRUCTURES DE DONNÉES }
 
-(………………………………….)
-\subsubsection{BIBLIOTHÈQUES}
+(………………… A COMPLÉTER ……………….)
 
-(………………………………….)
+\subsubsection{BIBLIOTHÈQUES}
+Les bibliothèques nous permettent d'utiliser des méthodes qui faciliteront la programmation du programme.
+Dans ce projet nous avons utiliser uniquement deux bibliothèques majeures notamment pour l'interface graphique qui sont : \begin{itemize}
+\item AWT : (Abstract Windows Toolkit) qui permet d'écrire des interfaces graphiques indépendantes du système d'exploitation.
+\item SWING : Nous utilisons aussi cette bibliothèque dans la gestion ou la modélisation de notre interface graphique ,elle a un but similaire a celui de AWT mais avec des modes de fonctionnement différent. 
+\end{itemize}
+(………………… A COMPLÉTER ……………….)
 
 \section{ARCHITECTURES DU PROJET }
-\subsubsection{DIAGRAMME DE CLASSES }
+\subsubsection{ Architecture globale des dossiers et des fichiers}
+Voici l'architecture de notre projet :
 
-(………………………………….)
+
+
+\makeatletter
+\newcount\dirtree@lvl
+\newcount\dirtree@plvl
+\newcount\dirtree@clvl
+\def\dirtree@growth{%
+  \ifnum\tikznumberofcurrentchild=1\relax
+  \global\advance\dirtree@plvl by 1
+  \expandafter\xdef\csname dirtree@p@\the\dirtree@plvl\endcsname{\the\dirtree@lvl}
+  \fi
+  \global\advance\dirtree@lvl by 1\relax
+  \dirtree@clvl=\dirtree@lvl
+  \advance\dirtree@clvl by -\csname dirtree@p@\the\dirtree@plvl\endcsname
+  \pgf@xa=0,5cm\relax
+  \pgf@ya=-0,45cm\relax
+  \pgf@ya=\dirtree@clvl\pgf@ya
+  \pgftransformshift{\pgfqpoint{\the\pgf@xa}{\the\pgf@ya}}%
+  \ifnum\tikznumberofcurrentchild=\tikznumberofchildren
+  \global\advance\dirtree@plvl by -1
+  \fi
+}
+
+\tikzset{
+  dirtree/.style={
+    growth function=\dirtree@growth,
+    every node/.style={anchor=north},
+    every child node/.style={anchor=west},
+    edge from parent path={(\tikzparentnode\tikzparentanchor) |- (\tikzchildnode\tikzchildanchor)}
+  }
+}
+
+
+
+
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}[dirtree]
+\node {src} 
+    child { node {XXX} }
+   ;
+\end{tikzpicture}
+\end{center}
+\caption{Arborescence des dossiers}
+\end{figure}
+
+
 \subsubsection{ CAS D’UTILISATION}
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
+
 \subsubsection{CHAÎNES DE TRAITEMENT }
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
 
 
 \section{EXPÉRIMENTATIONS ET USAGES }
 \subsubsection{CAPTURES D’ÉCRANS }
 
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
+
 \subsubsection{ MESURES DE PERFORMANCES }
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
 
 \section{CONCLUSION}
 \subsubsection{RÉCAPITULATIF DES FONCTIONNALITÉS PRINCIPALES }
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
 \subsubsection{PROPOSITIONS D’AMÉLIORATIONS }
 
-(………………………………….)
+(………………… A COMPLÉTER ……………….)
 
 \end{document} %fin du document
 
