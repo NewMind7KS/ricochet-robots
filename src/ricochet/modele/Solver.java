@@ -25,7 +25,7 @@ public class Solver {
 		if (ast != null) {
 			return ast;
 		}
-		addMoves(3);
+		addMoves(5);
 		return null;
 	}
 
@@ -140,20 +140,22 @@ public class Solver {
 				System.out.println("Taille allPossi : " + allPossibilities.size());
 				//taille de chaque élement dans allPossi
 				for (int i = 0; i < allPossibilities.size(); i++){
-					System.out.print("Taille de " + i + " élément de allPossi : " + allPossibilities.get(i).size()+" ");
+					System.out.println("Taille de " + i + " élément de allPossi : " + allPossibilities.get(i).size()+" ");
 				}
 				//affichages diverses
 				System.out.println("affichage astar()/possibility"+possibility);
 				System.out.println("----BEST----");
-				int j= 50;
+				int sizeList= 50;
+				int index = 0;
 				//choisi la taille minimale
 				for (int i = 0; i < allPossibilities.size(); i++){
-					if (allPossibilities.get(i).size() <  j){
-						j = i;
+					if (allPossibilities.get(i).size() <  sizeList){
+						index = i;
+						sizeList = allPossibilities.get(i).size();
 					}
 				}
 				//affichage best
-				System.out.println("VOICI LE MEILLEUR : " + allPossibilities.get(j));
+				System.out.println("VOICI LE MEILLEUR "+ index +" de taille " +sizeList+": " + allPossibilities.get(index));
 				return;
 			} else {
 				if (c != 0)

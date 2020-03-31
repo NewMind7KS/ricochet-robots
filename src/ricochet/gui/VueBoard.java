@@ -41,6 +41,7 @@ public class VueBoard extends JPanel implements EcouteurModele {
 			vc.updateContent();
 //		System.out.println("Mise à jour de la vue Board");
 		if (board.isFinished())
-			JOptionPane.showMessageDialog(this, "Jeu Terminé");
+			//JOptionPane.showMessageDialog(this, "Jeu Terminé");
+			System.out.println("----------Jeu Terminé-------------");
 	}
 }
