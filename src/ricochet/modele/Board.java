@@ -70,10 +70,10 @@ public class Board extends AbstractModeleEcoutable {
 		Random rand = new Random();
 		mainRobot = robots.get(rand.nextInt(robots.size()));
 		/* Pour les tests, on fixe le robot */
-//		for (Robot r : robots) {
-//			if (r.getId() == 6)
-//				mainRobot = r;
-//		}
+		for (Robot r : robots) {
+			if (r.getId() == 0)
+				mainRobot = r;
+		}
 		return mainRobot;
 	}
 
@@ -87,7 +87,7 @@ public class Board extends AbstractModeleEcoutable {
 		Random r = new Random();
 		mainGoal = goals.get(r.nextInt(goals.size()));
 		/* Pour les tests, on fixe la cible */
-//		mainGoal = goals.get(12);
+		mainGoal = goals.get(14);
 		return mainGoal;
 	}
 

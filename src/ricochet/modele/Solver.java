@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
-public class Solver {
+public class Solver implements Runnable {
 
 	private ArrayList<Node> closedList;
 	private ArrayList<Node> openList;
 	private Board board;
-	private static final Logger logger = Logger.getLogger("solve.log");
-	private ArrayList<ArrayList<Position> > allPossibilities= new ArrayList<ArrayList<Position> >();
+	private ArrayList<HashMap<Position, Integer>> allPossibilities = new ArrayList<HashMap<Position, Integer>>();
 
 	public Solver(Board board) {
 		this.board = board;
@@ -20,24 +18,37 @@ public class Solver {
 		openList = new ArrayList<Node>();
 	}
 
-	public ArrayList<Position> solve() {
+	public void solve() {
+		System.out.println("Lancement de A start une première fois");
 		ArrayList<Position> ast = astar();
 		if (ast != null) {
-			return ast;
+			System.out.println(ast);
+			return;
 		}
-		addMoves(5);
-		return null;
+		System.out.println("Pas de chemin direct, utilisation des autres robots");
+		addMoves(2, null);
+		int min = 40;
+		HashMap<Position, Integer> tmp = null;
+		for (HashMap<Position, Integer> map : allPossibilities) {
+			if (map.size() < min) {
+				min = map.size();
+				tmp = map;
+			}
+		}
+		System.out.println("Meilleur chemin trouvé : (! Mouvements pas dans l'ordre !)");
+		// Pour éviter ce problème il faut créer une classe qui contient l'identité du
+		// robot (id) et sa future position pour ensuite mettre ça dans une arryaList
+		// qui sera elle dans l'ordre
+		System.out.println(tmp);
 	}
 
 	public ArrayList<Position> astar() {
-		logger.info("Démarrage de la résolution du jeu");
 		closedList.clear();
 		openList.clear();
 
 		// Position de départ des mouvements et position cible
 		Position startPosition = board.getMainRobot().getPositionRobot();
 		Position arrivee = board.getMainGoal().getPositionGoal();
-		logger.info("\nPosition de départ : " + startPosition + "\nPosition d'arrivée : " + arrivee);
 
 		// Création du noeud de base
 		Node start = new Node(startPosition.getX(), startPosition.getY(), 0, board.distanceManhattan(), null);
@@ -48,7 +59,6 @@ public class Solver {
 		while (!openList.isEmpty()) {
 			// Récupération duy noeud avec la valeur la plus basse
 			Node minNode = Collections.min(openList);
-//			logger.info("Noeud min de openList : " + minNode);
 
 			// Effectue le déplacement du robot lié à la position du noeud
 			board.moveRobotToPosition(board.getMainRobot(), minNode.getPosition());
@@ -61,7 +71,6 @@ public class Solver {
 					chemin.add(minNode.getPosition());
 					minNode = minNode.ancestor;
 				}
-				System.out.println("Chemin : " + chemin);
 				board.moveRobotToPosition(board.getMainRobot(), startPosition);
 				return chemin;
 			}
@@ -69,15 +78,12 @@ public class Solver {
 			// ils ne sont pas dans closedList ou s'ils n'existent pas dans openList avec
 			// une valeur inférieure.
 			for (Position move : board.getAllMoves(minNode.getPosition())) {
-//				logger.info("Étude de la position : " + move);
 				// Création du nouveau noeud, sa position est la position d'arrivée après
 				// mouvement. Le cout d'un noeud est la distance de Manhattan entre son
 				// prédécesseur et lui-même. Quand à l'heuristique du noeud, c'est sa distance
 				// de Manhattan avec la cible principale.
 				Node nodeMove = new Node(move, board.distanceManhattan(minNode.getPosition(), move),
 						board.distanceManhattan(move), minNode);
-//				logger.info("Création du noeud associé : " + nodeMove);
-
 				insert = false;
 				// Si le nodeMove à une valeur plus basse que le même noeud dans closed, on peut
 				// l'ajouter à open
@@ -105,20 +111,11 @@ public class Solver {
 			openList.remove(minNode);
 			closedList.add(minNode);
 		}
-		/*
-		 * A ce moment, il n'y a pas de chemin direct pour le robot pour se rendre sur
-		 * la cible. Il faut don cutiliser les autres robots. Mais utiliser les autres
-		 * robots : - Faire bouger le plus proche de la cible ? Et relancer a* -
-		 * Ajouterdans l'algo toutes les positions possibles de tous les robots (donc
-		 * revoir l'évaluation des noeuds) - Jouer un robot au hasard puis relancer a* :
-		 * mauvaise idée - Faire bouger un robot proche de celui du joueur ?
-		 */
-		logger.warning("Solve error, no direct path to complete");
 		board.moveRobotToPosition(board.getMainRobot(), startPosition);
 		return null;
 	}
 
-	public void addMoves(int c) {
+	public void addMoves(int c, HashMap<Position, Integer> path) {
 		HashMap<Position, Robot> moves = new HashMap<Position, Robot>();
 		for (Robot r : board.getRobots()) {
 			if (r == board.getMainRobot())
@@ -128,38 +125,28 @@ public class Solver {
 			}
 		}
 		for (Entry<Position, Robot> entry : moves.entrySet()) {
-			System.out.println(entry.getKey() + " = " + entry.getValue());
+			if (path == null) {
+				path = new HashMap<Position, Integer>();
+			}
+			path.put(entry.getKey(), entry.getValue().getId());
+
 			Position oldPosition = entry.getValue().getPositionRobot();
 			board.moveRobotToPosition(entry.getValue(), entry.getKey());
 			if (astar() != null) {
-				System.err.println("Solution trouvée");
-				//ajout solution
-				ArrayList<Position> possibility = astar();
-				allPossibilities.add(possibility);
-				//taille de allPossi
-				System.out.println("Taille allPossi : " + allPossibilities.size());
-				//taille de chaque élement dans allPossi
-				for (int i = 0; i < allPossibilities.size(); i++){
-					System.out.println("Taille de " + i + " élément de allPossi : " + allPossibilities.get(i).size()+" ");
+				ArrayList<Position> solution = astar();
+				for (Position p : solution) {
+					path.put(p, board.getMainRobot().getId());
 				}
-				//affichages diverses
-				System.out.println("affichage astar()/possibility"+possibility);
-				System.out.println("----BEST----");
-				int sizeList= 50;
-				int index = 0;
-				//choisi la taille minimale
-				for (int i = 0; i < allPossibilities.size(); i++){
-					if (allPossibilities.get(i).size() <  sizeList){
-						index = i;
-						sizeList = allPossibilities.get(i).size();
-					}
+				allPossibilities.add(new HashMap<Position, Integer>(path));
+				for (Position p : solution) {
+					path.remove(p, board.getMainRobot().getId());
 				}
-				//affichage best
-				System.out.println("VOICI LE MEILLEUR "+ index +" de taille " +sizeList+": " + allPossibilities.get(index));
-				return;
+				path.remove(entry.getKey());
+				board.moveRobotToPosition(entry.getValue(), oldPosition);
 			} else {
+				path.remove(entry.getKey());
 				if (c != 0)
-					addMoves(c - 1);
+					addMoves(c - 1, path);
 				board.moveRobotToPosition(entry.getValue(), oldPosition);
 			}
 		}
@@ -244,5 +231,10 @@ public class Solver {
 			else
 				return -1;
 		}
+	}
+
+	@Override
+	public void run() {
+		solve();
 	}
 }

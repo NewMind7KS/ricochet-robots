@@ -62,8 +62,10 @@ public class VueMenu extends JPanel implements EcouteurModele {
 				board.printBoard();
 			else if (ae.getSource() == test)
 				board.writeBoard("Board.txt");
-			else if (ae.getSource() == test2)
-				new Solver(board).solve();
+			else if (ae.getSource() == test2) {
+				Thread th = new Thread(new Solver(board));
+				th.start();
+			}
 			else if (ae.getSource() == reset)
 				board.loadBoard();
 			else if (ae.getSource() == liste)
