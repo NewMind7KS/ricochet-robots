@@ -9,7 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import ricochet.modele.Board;
-import ricochet.modele.Solver;
+import ricochet.modele.Solve;
 import ricochet.util.EcouteurModele;
 import ricochet.util.ModeleEcoutable;
 
@@ -22,6 +22,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	private JButton test2;
 	private JButton reset;
 	private JComboBox<Object> liste;
+	private JComboBox<Object> liste2;
 
 	public VueMenu(Board board) {
 		this.setLayout(new GridLayout(10, 2));
@@ -40,13 +41,17 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		reset.addActionListener(new ActionButton());
 		add(reset);
 		liste = new JComboBox<Object>(board.getRobots().toArray());
+		liste2 = new JComboBox<Object>(board.getGoals().toArray());
 		add(liste);
+		add(liste2);
 		liste.addActionListener(new ActionButton());
+		liste2.addActionListener(new ActionButton());
 		printBoard.setFocusable(false);
 		test.setFocusable(false);
 		test2.setFocusable(false);
 		reset.setFocusable(false);
 		liste.setFocusable(false);
+		liste2.setFocusable(false);
 	}
 
 	@Override
@@ -63,13 +68,15 @@ public class VueMenu extends JPanel implements EcouteurModele {
 			else if (ae.getSource() == test)
 				board.writeBoard("Board.txt");
 			else if (ae.getSource() == test2) {
-				Thread th = new Thread(new Solver(board));
+				Thread th = new Thread(new Solve(board));
 				th.start();
 			}
 			else if (ae.getSource() == reset)
 				board.loadBoard();
 			else if (ae.getSource() == liste)
 				board.setMainRobot(board.getRobots().get(liste.getSelectedIndex()));
+			else if (ae.getSource() == liste2)
+				board.setMainGoal(board.getGoals().get(liste2.getSelectedIndex()));
 		}
 	}
 }

@@ -573,6 +573,16 @@ public class Board extends AbstractModeleEcoutable {
 	}
 
 	/**
+	 * Affectation d'une nouvelle cible principale pour la partie.
+	 * 
+	 * @param r Nouvelle cible principale pour la partie.
+	 */
+	public void setMainGoal(Goal goal) {
+		mainGoal = goal;
+		notifyListener();
+	}
+
+	/**
 	 * Distance de Manhattan entre le robot principal et la cible principale
 	 * 
 	 * @return Distance de Manhattan entre le robot principal et la cible principale
@@ -731,4 +741,29 @@ public class Board extends AbstractModeleEcoutable {
 		notifyListener();
 	}
 
+	public int heuristique() {
+//		int totalHeuristique = 0;
+//		if (isFinished())
+//			return 0;
+//		if (isRobot(mainGoal.getPositionGoal()))
+//			return 100;
+//		for (Robot r : robots) {
+//			if (r == mainRobot)
+//				totalHeuristique += distanceManhattan(r.getPositionRobot()) * 2;
+//			else
+//				totalHeuristique += distanceManhattan(r.getPositionRobot());
+//		}
+//		return totalHeuristique;
+		return distanceManhattan();
+	}
+
+	public ArrayList<Robot> getOrderedRobots() {
+		ArrayList<Robot> ordered = new ArrayList<Robot>();
+		ordered.add(mainRobot);
+		for (Robot r : robots) {
+			if (r != mainRobot)
+				ordered.add(r);
+		}
+		return ordered;
+	}
 }
