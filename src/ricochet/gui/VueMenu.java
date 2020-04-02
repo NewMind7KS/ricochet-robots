@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import ricochet.modele.BFSSearch;
 import ricochet.modele.Board;
 import ricochet.modele.Solve;
 import ricochet.util.EcouteurModele;
@@ -57,6 +58,8 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	@Override
 	public void modeleMisAJour(ModeleEcoutable source) {
 //		text.setText("Robot : " + board.getMainRobot() + ", Goal : " + board.getMainGoal());
+		liste.repaint();
+		liste2.repaint();
 	}
 
 	class ActionButton implements ActionListener {
@@ -68,7 +71,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 			else if (ae.getSource() == test)
 				board.writeBoard("Board.txt");
 			else if (ae.getSource() == test2) {
-				Thread th = new Thread(new Solve(board));
+				Thread th = new Thread(new BFSSearch(board));
 				th.start();
 			}
 			else if (ae.getSource() == reset)

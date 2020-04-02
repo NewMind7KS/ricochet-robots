@@ -25,4 +25,33 @@ public enum Direction {
 		Random rand = new Random();
 		return values()[rand.nextInt(values().length)];
 	}
+
+	public static String symbol(Direction dir) {
+		switch (dir) {
+		case N:
+			return "↑";
+		case S:
+			return "↓";
+		case E:
+			return "→";
+		case W:
+			return "←";
+		default:
+			return "*";
+		}
+	}
+	
+	public static Direction opposite(Direction dir) {
+		switch (dir) {
+		case N:
+			return S;
+		case S:
+			return N;
+		case E:
+			return W;
+		case W:
+			return E;
+		}
+		return null;
+	}
 }

@@ -82,77 +82,88 @@ public class Solve implements Runnable {
 				return new LinkedList<Node>();
 			}
 			Node n = Collections.min(open);
-			board.moveRobotToPosition(n.robotMoved, n.p);
+//			board.moveRobotToPosition(n.robotMoved, n.p);
 			System.out.println("Noeud min : " + n);
 			open.remove(n);
 			closed.add(n);
 
-			if (board.isFinished())
+			if (n.isMainRobot() && n.p.equals(board.getMainGoal().getPositionGoal()))
 				return n.path();
 			for (Node child : transitions(n)) {
-				if (!addOpenOrClosedMinor(child)) {
+				addOpenOrClosedMinor(child);
+				if(!open.contains(child) && !closed.contains(child))
 					open.add(child);
-				}
 			}
 		}
 	}
 
 	public boolean addOpenOrClosedMinor(Node n) {
 		boolean in = false;
-		boolean inListOpenOrClosed = false;
 		Node tmp = null;
+
 		for (Node o : closed) {
-			if (n.p.equals(o.p) && n.robotMoved == o.robotMoved) {
-				inListOpenOrClosed = true;
-				if (n.f() <= o.f()) {
-					in = true;
-					tmp = o;
-					break;
-				}
+			if (n.p.equals(o.p) && n.robotMoved == o.robotMoved && n.f() <= o.f()) {
+				in = true;
+				tmp = o;
+				break;
 			}
 		}
 		if (in) {
-			closed.add(n);
-			return inListOpenOrClosed;
+			closed.remove(tmp);
+			open.add(n);
+			return true;
 		}
-		
+
 		for (Node o : open) {
-			if (n.p.equals(o.p) && n.robotMoved == o.robotMoved) {
-				inListOpenOrClosed = true;
-				if (n.f() <= o.f()) {
-					in = true;
-					tmp = o;
-					break;
-				}
+			if (n.p.equals(o.p) && n.robotMoved == o.robotMoved && n.f() <= o.f()) {
+				in = true;
+				tmp = o;
+				break;
 			}
 		}
 		if (in) {
 			open.remove(tmp);
 			open.add(n);
-			return inListOpenOrClosed;
+			return true;
 		}
-		return inListOpenOrClosed;
+		return false;
 	}
 
 	public LinkedList<Node> transitions(Node n) {
 		LinkedList<Node> transitions = new LinkedList<Node>();
-		for (Robot r : board.getOrderedRobots()) {
-			if (r == board.getMainRobot()) {
-				for (Position p : board.getAllMoves(r)) {
-					Position oldPosition = new Position(r.getPositionRobot());
-					board.moveRobotToPosition(r, p);
-					Node move = new Node(p, r, n);
-					board.moveRobotToPosition(r, oldPosition);
-					transitions.add(move);
-				}
-			} else {
-				for (Position p : board.getAllMoves(r)) {
-					Node move = new Node(p, r, n);
-					transitions.add(move);
-				}
-			}
-		}
+//		for (Robot r : board.getOrderedRobots()) {
+//			if (r == board.getMainRobot()) {
+//				for (Position p : board.getAllMoves(r)) {
+//					Position oldPosition = new Position(r.getPositionRobot());
+//					board.moveRobotToPosition(r, p);
+//					Node move = new Node(p, r, n);
+//					board.moveRobotToPosition(r, oldPosition);
+//					transitions.add(move);
+//				}
+//			} else {
+//				for (Position p : board.getAllMoves(r)) {
+//					Node move = new Node(p, r, n);
+//					transitions.add(move);
+//				}
+//			}
+//		}
 
+		for (Robot r : board.getRobots()) {
+			if (r != board.getMainRobot())
+				continue;
+			board.play(n.path());
+			for (Position p : board.getAllMoves(r)) {
+				Position oldPositionRobot = new Position(r.getPositionRobot());
+				board.moveRobotToPosition(r, p);
+				System.out.println(n.path().toString() + p + r);
+
+				Node mv = new Node(p, r, n);
+
+				board.moveRobotToPosition(r, oldPositionRobot);
+				transitions.add(mv);
+			}
+			board.play(n.invertPath());
+		}
 		return transitions;
 	}
 
@@ -172,7 +183,7 @@ public class Solve implements Runnable {
 			if (ancestor == null)
 				this.cout = 0;
 			else
-				this.cout = board.distanceManhattan(p, ancestor.p);
+				this.cout = ancestor.cout + 1;
 		}
 
 		public boolean isMainRobot() {
@@ -211,6 +222,12 @@ public class Solve implements Runnable {
 				path.addFirst(tmp);
 				tmp = tmp.ancestor;
 			}
+			return path;
+		}
+
+		public LinkedList<Node> invertPath() {
+			LinkedList<Node> path = path();
+			Collections.reverse(path);
 			return path;
 		}
 
@@ -271,6 +288,14 @@ public class Solve implements Runnable {
 			} else if (!robotMoved.equals(other.robotMoved))
 				return false;
 			return true;
+		}
+
+		public Robot getRobot() {
+			return robotMoved;
+		}
+
+		public Position getPosition() {
+			return p;
 		}
 	}
 

@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
+import ricochet.modele.Solve.Node;
 import ricochet.util.AbstractModeleEcoutable;
 
 /**
@@ -765,5 +767,12 @@ public class Board extends AbstractModeleEcoutable {
 				ordered.add(r);
 		}
 		return ordered;
+	}
+
+	public void play(LinkedList<Node> path) {
+		for (Node n : path) {
+			moveRobotToPosition(n.getRobot(), n.getPosition());
+		}
+		notifyListener();
 	}
 }
