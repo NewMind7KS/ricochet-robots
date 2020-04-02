@@ -1,7 +1,8 @@
 package ricochet.modele;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -16,19 +17,18 @@ import java.util.LinkedList;
  * children sont générés puis testés. Le temps de résolution est proportionnel à
  * la complexité de la solution (l nombre de mouvements requis).
  * 
- * TODO :: Optimisation en donna tles positions d'arrivée pour éviter de
- * recalculer à chaque fois pour les déplacements.
- * 
  * @author alex
  *
  */
 public class BFSSearch implements Runnable {
 
 	/** Compteur de noeuds parcourus */
-	private static long cpt = 0;
+	private static long compteurNode = 0;
 
 	/** Plateau de jeu initial */
 	private Board board;
+
+	private HashMap<Robot, Position> originalPosition = new HashMap<Robot, Position>();
 
 	/** Profondeur maximum de recherche */
 	public byte profondeur = 5;
@@ -40,6 +40,9 @@ public class BFSSearch implements Runnable {
 	 */
 	public BFSSearch(Board b) {
 		this.board = b;
+		for (Robot r : board.getRobots()) {
+			originalPosition.put(r, new Position(r.getPositionRobot()));
+		}
 	}
 
 	/**
@@ -48,7 +51,6 @@ public class BFSSearch implements Runnable {
 	@Override
 	public void run() {
 		search();
-		cpt = 0;
 	}
 
 	/**
@@ -57,39 +59,52 @@ public class BFSSearch implements Runnable {
 	 * les possibilités pour les profondeurs de recherche suivantes. La recherche
 	 * s'arrête à la profondeur maximum en attribut. Sur chaque profondeur, tous les
 	 * état sont testés pour déterminer si la partie est terminée. Chaque état est
-	 * une clsse interne State.
+	 * une classe interne State.
+	 * 
+	 * @return Liste des mouvements pour arriver au but
 	 */
-	private void search() {
+	public LinkedList<Move> search() {
+		System.out.println("Démarrage résolution pour robot : " + board.getMainRobot().getName());
+		System.out.println("Cible principale : " + board.getMainGoal().getName());
+		byte prof = profondeur;
 		long begin = System.nanoTime();
 		boolean finished = false;
 		State root = new State();
 		ArrayList<State> nodes = new ArrayList<State>();
 		nodes.add(root);
 		while (!finished) {
+			if (prof-- == 0) {
+				System.out.println("Pas de chemin pour profondeur " + profondeur);
+				break;
+			}
 			ArrayList<State> childs = new ArrayList<State>();
 			for (State s : nodes) {
 				childs.addAll(s.childs());
 			}
 			for (State sprime : childs) {
+				compteurNode++;
 				if (sprime.isFinished()) {
 					System.out.println("----------- Optimal Solution ------------");
 					System.out.println(sprime.getPath());
 					System.out.println("-----------------------------------------");
-					System.out.println("Noeuds parcourus : \t\t" + cpt);
+					System.out.println("Noeuds parcourus : \t\t" + compteurNode);
 					finished = true;
-					break;
+					long end = System.nanoTime() - begin;
+					DecimalFormat df = new DecimalFormat();
+					df.setMaximumFractionDigits(3);
+					System.out.println("Temps execution : \t\t" + df.format(end / 1e9) + "s");
+					return sprime.getPath();
 				}
 			}
 			nodes.clear();
 			nodes = childs;
-
-			if (nodes.get(0).deep == 5) {
-				System.out.println("Pas de chemin court trouvé");
-				break;
-			}
 		}
 		long end = System.nanoTime() - begin;
-		System.out.println("Temps execution : \t\t" + end);
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(3);
+		System.out.println("Noeuds parcourus : \t\t" + compteurNode);
+		System.out.println("Temps execution : \t\t" + df.format(end / 1e9) + "s");
+		return new LinkedList<Move>();
 	}
 
 	/**
@@ -109,9 +124,6 @@ public class BFSSearch implements Runnable {
 		/** Robot concerné par le mouvement */
 		private Robot robotMoved;
 
-		/** Position de départ du robot */
-		private Position depart;
-
 		/** State parent générateur */
 		private State ancestor;
 
@@ -126,8 +138,6 @@ public class BFSSearch implements Runnable {
 			this.robotMoved = board.getMainRobot();
 			this.ancestor = null;
 			this.deep = 0;
-			this.depart = new Position(robotMoved.getPositionRobot());
-			cpt++;
 		}
 
 		/**
@@ -135,7 +145,7 @@ public class BFSSearch implements Runnable {
 		 * action à réaliser sur le plateau représentée par le currentMove et le
 		 * robotMoved concerné. Le coup joué sur ce State est supplémentaire à ceux
 		 * joués par ses ancètres. Il faut remonter le chemin des parents pour jouer
-		 * chaque coup de jeu et arriver à létat du plateau demandé.
+		 * chaque coup de jeu et arriver à l'état du plateau demandé.
 		 * 
 		 * @param move     Direction du mouvement pour le robot concerné
 		 * @param r        Robot concerné par le mouvement dans une direction donnée
@@ -146,38 +156,26 @@ public class BFSSearch implements Runnable {
 			this.robotMoved = r;
 			this.ancestor = ancestor;
 			this.deep = (byte) (this.ancestor.deep + 1);
-			this.depart = new Position(robotMoved.getPositionRobot());
-			cpt++;
 		}
 
 		/**
 		 * Méthode permettant de jouer tous les coups depuis le premier noeud parent en
 		 * suivant le chemin parcouru pour arriver à l'état acutel. Chaque état du
 		 * chemin comporte un robot à jouer et une direction pour ce dernier.
-		 * 
-		 * TODO : Pour optimiser cette méthode sotcker les position d'arrivée pour
-		 * chaque état plutot que d'utiliser le path.
 		 */
 		public void playPath() {
 			LinkedList<Move> path = getPath();
 			for (Move m : path) {
-				board.moveRobot(m.r, m.dir);
+				m.r.setPosition(board.move(m.r.getPositionRobot(), m.dir));
 			}
 		}
 
 		/**
-		 * Méthode permettant de jouer tous les coups inverses pour revenir à létat
-		 * initial du plateau de jeu. Pour cela le chemin parcouru pars du noeud actuel
-		 * et remonte à la racine. Chaque état contient un robot joué et sa position de
-		 * départ. En effet, il faut réutiliser la position de départ du robot car pour
-		 * certains état de jeu. Les robots ne sont placés contre aucun mur. Les faire
-		 * bouger dans la direction ooposé ne leur permettrait pas de retrouver leur
-		 * position originale.
+		 * Réinitialisation de la position de tous les robots.
 		 */
 		public void playInvertPath() {
-			LinkedList<MovePosition> path = getInvertPath();
-			for (MovePosition m : path) {
-				board.moveRobotToPosition(m.r, m.p);
+			for (Robot r : board.getRobots()) {
+				r.setPosition(originalPosition.get(r));
 			}
 		}
 
@@ -241,30 +239,6 @@ public class BFSSearch implements Runnable {
 			return path;
 		}
 
-		/**
-		 * Liste chainée de Move, ce sont des mouvements inverses pour le jeu
-		 * représentés par un robot concerné et une position de départ donnée depuis le
-		 * chemin des ancètres de l'état actuel.
-		 * 
-		 * TODO : au lieu de jouer le chemin inverse, stocker les position de base de
-		 * chaque robot sur le plateau original et les replacer comme cela. => Bien plus
-		 * rapide.
-		 * 
-		 * @return Liste chainée de Move, mouvements inverses effectuées depuis le noeud
-		 *         actuel jusqu'à la racine permettant de retrouver la position
-		 *         originale des robots.
-		 */
-		public LinkedList<MovePosition> getInvertPath() {
-			LinkedList<MovePosition> path = new LinkedList<MovePosition>();
-			State tmp = this;
-			while (tmp.ancestor != null) {
-				path.addFirst(new MovePosition(tmp.robotMoved, tmp.depart));
-				tmp = tmp.ancestor;
-			}
-			Collections.reverse(path);
-			return path;
-		}
-
 		public String toString() {
 			return currentMove + " " + robotMoved + " " + deep + " " + isFinished() + getPath();
 		}
@@ -302,32 +276,6 @@ public class BFSSearch implements Runnable {
 		 */
 		public String toString() {
 			return "R" + r.getId() + " : " + Direction.symbol(dir);
-		}
-	}
-
-	/**
-	 * Mouvement effectué sur le plateau représenté par un robot concerné et une
-	 * position d'arrivée du mouvement. Cette classe est utilisée pour jouer les
-	 * mouvements inverses.
-	 * 
-	 * @author alex
-	 *
-	 */
-	class MovePosition {
-
-		/** Robot concerné par le mouvement */
-		Robot r;
-
-		/** Position d'arrivée du mouvement */
-		Position p;
-
-		public MovePosition(Robot r, Position p) {
-			this.r = r;
-			this.p = p;
-		}
-
-		public String toString() {
-			return "R" + r.getId() + " : " + p;
 		}
 	}
 }

@@ -7,10 +7,10 @@ package ricochet.modele;
 public class Position {
 
 	/** Position x : abscisse */
-	private int x;
+	private short x;
 
 	/** Position y : ordonnée */
-	private int y;
+	private short y;
 
 	/**
 	 * Création d'une position de coordonnées (x,y).
@@ -18,7 +18,7 @@ public class Position {
 	 * @param x Position x
 	 * @param y Position y
 	 */
-	public Position(int x, int y) {
+	public Position(short x, short y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -33,23 +33,23 @@ public class Position {
 		this.y = p.getY();
 	}
 
-	public int getX() {
+	public short getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public void setX(short x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public short getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(short y) {
 		this.y = y;
 	}
 
-	public void setPosition(int x, int y) {
+	public void setPosition(short x, short y) {
 		this.x = x;
 		this.y = y;
 	}

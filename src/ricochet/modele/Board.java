@@ -6,10 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
-import ricochet.modele.Solve.Node;
 import ricochet.util.AbstractModeleEcoutable;
 
 /**
@@ -71,11 +69,6 @@ public class Board extends AbstractModeleEcoutable {
 		assert robots.size() > 0 : "Robots taille 0";
 		Random rand = new Random();
 		mainRobot = robots.get(rand.nextInt(robots.size()));
-		/* Pour les tests, on fixe le robot */
-		for (Robot r : robots) {
-			if (r.getId() == 0)
-				mainRobot = r;
-		}
 		return mainRobot;
 	}
 
@@ -88,8 +81,6 @@ public class Board extends AbstractModeleEcoutable {
 		assert goals.size() > 0 : "Goals taille 0";
 		Random r = new Random();
 		mainGoal = goals.get(r.nextInt(goals.size()));
-		/* Pour les tests, on fixe la cible */
-		mainGoal = goals.get(14);
 		return mainGoal;
 	}
 
@@ -188,9 +179,9 @@ public class Board extends AbstractModeleEcoutable {
 	 * @return Vrai si un robot est présent dans la case à l'Ouest (gauche) de la
 	 *         position en (x,y).
 	 */
-	private boolean isRobotW(int x, int y) {
+	private boolean isRobotW(short x, short y) {
 		if (x < height && y < width && x >= 0 && y > 0) {
-			Position p = new Position(x, y - 1);
+			Position p = new Position(x, (short) (y - 1));
 			return isRobot(p);
 		}
 		return false;
@@ -205,9 +196,9 @@ public class Board extends AbstractModeleEcoutable {
 	 * @return Vrai si un robot est présent dans la case à l'Est (droite) de la
 	 *         position en (x,y).
 	 */
-	private boolean isRobotE(int x, int y) {
+	private boolean isRobotE(short x, short y) {
 		if (x < height && y < width && x >= 0 && y >= 0) {
-			Position p = new Position(x, y + 1);
+			Position p = new Position(x, (short) (y + 1));
 			return isRobot(p);
 		}
 		return false;
@@ -222,9 +213,9 @@ public class Board extends AbstractModeleEcoutable {
 	 * @return Vrai si un robot est présent dans la case au Sud (bas) de la position
 	 *         en (x,y).
 	 */
-	private boolean isRobotS(int x, int y) {
+	private boolean isRobotS(short x, short y) {
 		if (x < height && y < width && x >= 0 && y >= 0) {
-			Position p = new Position(x + 1, y);
+			Position p = new Position((short) (x + 1), y);
 			return isRobot(p);
 		}
 		return false;
@@ -239,9 +230,9 @@ public class Board extends AbstractModeleEcoutable {
 	 * @return Vrai si un robot est présent dans la case au Nord (haut) de la
 	 *         position en (x,y).
 	 */
-	private boolean isRobotN(int x, int y) {
+	private boolean isRobotN(short x, short y) {
 		if (x < height && y < width && x > 0 && y >= 0) {
-			Position p = new Position(x - 1, y);
+			Position p = new Position((short) (x - 1), y);
 			return isRobot(p);
 		}
 		return false;
@@ -298,9 +289,9 @@ public class Board extends AbstractModeleEcoutable {
 	 */
 	public void printBoard() {
 		String putStr = "";
-		for (int i = 0; i < height; i++) {
+		for (short i = 0; i < height; i++) {
 			putStr = String.valueOf(i) + " ";
-			for (int j = 0; j < width; j++) {
+			for (short j = 0; j < width; j++) {
 				putStr += isRobot(new Position(i, j)) ? "R" : " ";
 				putStr += isGoal(new Position(i, j)) ? "G" : " ";
 				putStr += cases[i][j].toString() + "|";
@@ -352,16 +343,16 @@ public class Board extends AbstractModeleEcoutable {
 		while (!isWall(p.getX(), p.getY(), dir) && !isRobot(p, dir)) {
 			switch (dir) {
 			case N:
-				p.setX(p.getX() - 1);
+				p.setX((short) (p.getX() - 1));
 				break;
 			case S:
-				p.setX(p.getX() + 1);
+				p.setX((short) (p.getX() + 1));
 				break;
 			case W:
-				p.setY(p.getY() - 1);
+				p.setY((short) (p.getY() - 1));
 				break;
 			case E:
-				p.setY(p.getY() + 1);
+				p.setY((short) (p.getY() + 1));
 				break;
 			}
 		}
@@ -394,7 +385,6 @@ public class Board extends AbstractModeleEcoutable {
 		Position p = r.getPositionRobot();
 		if (isRobot(p))
 			getRobot(p).setPosition(newPosition);
-		notifyListener();
 	}
 
 	/**
@@ -535,7 +525,7 @@ public class Board extends AbstractModeleEcoutable {
 	 * @return La description textuelle de la liste des entités présentes à la case
 	 *         en position (x,y).
 	 */
-	public String getEntities(int x, int y) {
+	public String getEntities(short x, short y) {
 		return getEntities(new Position(x, y));
 	}
 
@@ -643,8 +633,8 @@ public class Board extends AbstractModeleEcoutable {
 	 */
 	public void writeBoard(String filename) {
 		String str = "";
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
+		for (short i = 0; i < height; i++) {
+			for (short j = 0; j < width; j++) {
 				if (cases[i][j].toWrite() != "" || isRobot(new Position(i, j)) || isGoal(new Position(i, j))) {
 					str += String.valueOf(i) + " " + String.valueOf(j) + " " + cases[i][j].toWrite();
 					str += isRobot(new Position(i, j)) ? "R " : "";
@@ -694,7 +684,7 @@ public class Board extends AbstractModeleEcoutable {
 			BufferedReader file = new BufferedReader(new FileReader(new File("./" + this.filename)));
 			String line = "";
 			int nLine = 0;
-			int x, y;
+			short x, y;
 			while ((line = file.readLine()) != null) {
 				nLine++;
 				String[] values = line.split(" ");
@@ -703,8 +693,8 @@ public class Board extends AbstractModeleEcoutable {
 					break;
 				}
 				try {
-					x = Integer.valueOf(values[0]);
-					y = Integer.valueOf(values[1]);
+					x = Short.valueOf(values[0]);
+					y = Short.valueOf(values[1]);
 					if (x < 0 || y < 0 || x > 15 || y > 15)
 						new NumberFormatException();
 				} catch (NumberFormatException ne) {
@@ -740,39 +730,6 @@ public class Board extends AbstractModeleEcoutable {
 		}
 		takeRobot();
 		takeGoal();
-		notifyListener();
-	}
-
-	public int heuristique() {
-//		int totalHeuristique = 0;
-//		if (isFinished())
-//			return 0;
-//		if (isRobot(mainGoal.getPositionGoal()))
-//			return 100;
-//		for (Robot r : robots) {
-//			if (r == mainRobot)
-//				totalHeuristique += distanceManhattan(r.getPositionRobot()) * 2;
-//			else
-//				totalHeuristique += distanceManhattan(r.getPositionRobot());
-//		}
-//		return totalHeuristique;
-		return distanceManhattan();
-	}
-
-	public ArrayList<Robot> getOrderedRobots() {
-		ArrayList<Robot> ordered = new ArrayList<Robot>();
-		ordered.add(mainRobot);
-		for (Robot r : robots) {
-			if (r != mainRobot)
-				ordered.add(r);
-		}
-		return ordered;
-	}
-
-	public void play(LinkedList<Node> path) {
-		for (Node n : path) {
-			moveRobotToPosition(n.getRobot(), n.getPosition());
-		}
 		notifyListener();
 	}
 }

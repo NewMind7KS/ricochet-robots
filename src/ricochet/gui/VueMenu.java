@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import ricochet.modele.BFSSearch;
 import ricochet.modele.Board;
-import ricochet.modele.Solve;
+import ricochet.modele.Solver;
 import ricochet.util.EcouteurModele;
 import ricochet.util.ModeleEcoutable;
 
@@ -19,8 +19,9 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	private static final long serialVersionUID = 1L;
 	private Board board;
 	private JButton printBoard;
-	private JButton test;
-	private JButton test2;
+	private JButton writeBoard;
+	private JButton BFSSearch;
+	private JButton astar;
 	private JButton reset;
 	private JComboBox<Object> liste;
 	private JComboBox<Object> liste2;
@@ -32,12 +33,15 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		printBoard = new JButton("Print board");
 		printBoard.addActionListener(new ActionButton());
 		add(printBoard);
-		test = new JButton("Enregistrer plateau");
-		test.addActionListener(new ActionButton());
-		add(test);
-		test2 = new JButton("A*");
-		test2.addActionListener(new ActionButton());
-		add(test2);
+		writeBoard = new JButton("Enregistrer plateau");
+		writeBoard.addActionListener(new ActionButton());
+		add(writeBoard);
+		BFSSearch = new JButton("BFSSearch");
+		BFSSearch.addActionListener(new ActionButton());
+		add(BFSSearch);
+		astar = new JButton("A* Solver");
+		astar.addActionListener(new ActionButton());
+		add(astar);
 		reset = new JButton("Reset Board");
 		reset.addActionListener(new ActionButton());
 		add(reset);
@@ -48,8 +52,9 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		liste.addActionListener(new ActionButton());
 		liste2.addActionListener(new ActionButton());
 		printBoard.setFocusable(false);
-		test.setFocusable(false);
-		test2.setFocusable(false);
+		writeBoard.setFocusable(false);
+		BFSSearch.setFocusable(false);
+		astar.setFocusable(false);
 		reset.setFocusable(false);
 		liste.setFocusable(false);
 		liste2.setFocusable(false);
@@ -68,10 +73,12 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		public void actionPerformed(ActionEvent ae) {
 			if (ae.getSource() == printBoard)
 				board.printBoard();
-			else if (ae.getSource() == test)
+			else if (ae.getSource() == writeBoard)
 				board.writeBoard("Board.txt");
-			else if (ae.getSource() == test2) {
-				Thread th = new Thread(new BFSSearch(board));
+			else if (ae.getSource() == BFSSearch) {
+				BFSSearch search = new BFSSearch(board);
+				search.profondeur = 5;
+				Thread th = new Thread(search);
 				th.start();
 			}
 			else if (ae.getSource() == reset)
@@ -80,6 +87,10 @@ public class VueMenu extends JPanel implements EcouteurModele {
 				board.setMainRobot(board.getRobots().get(liste.getSelectedIndex()));
 			else if (ae.getSource() == liste2)
 				board.setMainGoal(board.getGoals().get(liste2.getSelectedIndex()));
+			else if (ae.getSource() == astar) {
+				Thread th = new Thread(new Solver(board));
+				th.start();
+			}
 		}
 	}
 }

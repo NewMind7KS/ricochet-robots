@@ -17,6 +17,11 @@ public class Solver implements Runnable {
 		closedList = new ArrayList<Node>();
 		openList = new ArrayList<Node>();
 	}
+	
+	@Override
+	public void run() {
+		astar();
+	}
 
 	public void solve() {
 		System.out.println("Lancement de A start une première fois");
@@ -36,9 +41,6 @@ public class Solver implements Runnable {
 			}
 		}
 		System.out.println("Meilleur chemin trouvé : (! Mouvements pas dans l'ordre !)");
-		// Pour éviter ce problème il faut créer une classe qui contient l'identité du
-		// robot (id) et sa future position pour ensuite mettre ça dans une arryaList
-		// qui sera elle dans l'ordre
 		System.out.println(tmp);
 	}
 
@@ -72,6 +74,7 @@ public class Solver implements Runnable {
 					minNode = minNode.ancestor;
 				}
 				board.moveRobotToPosition(board.getMainRobot(), startPosition);
+				System.out.println(chemin);
 				return chemin;
 			}
 			// Si ce n'est pas l'arrivée, on ajoute tous les enfants noeuds dans openList si
@@ -112,6 +115,7 @@ public class Solver implements Runnable {
 			closedList.add(minNode);
 		}
 		board.moveRobotToPosition(board.getMainRobot(), startPosition);
+		System.out.println("Pas de chemin trouvé avec A*");
 		return null;
 	}
 
@@ -154,8 +158,8 @@ public class Solver implements Runnable {
 
 	class Node implements Comparable<Node> {
 
-		private int x;
-		private int y;
+		private short x;
+		private short y;
 		private int cout;
 		private int heuristique;
 		private Node ancestor;
@@ -175,7 +179,7 @@ public class Solver implements Runnable {
 		 *                    plateau
 		 * @param ancestor    Ancètre qui à permis d'accéder à ce noeud.
 		 */
-		public Node(int x, int y, int cout, int heuristique, Node ancestor) {
+		public Node(short x, short y, int cout, int heuristique, Node ancestor) {
 			this.x = x;
 			this.y = y;
 			this.cout = cout;
@@ -231,10 +235,5 @@ public class Solver implements Runnable {
 			else
 				return -1;
 		}
-	}
-
-	@Override
-	public void run() {
-		solve();
 	}
 }

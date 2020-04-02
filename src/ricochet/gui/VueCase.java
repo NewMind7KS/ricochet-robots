@@ -17,11 +17,11 @@ public class VueCase extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private Dimension dimCase = new Dimension(42, 42);
-	private int x;
-	private int y;
+	private short x;
+	private short y;
 	private Board board;
 
-	public VueCase(int x, int y, Board board) {
+	public VueCase(short x, short y, Board board) {
 		this.board = board;
 		this.setPreferredSize(dimCase);
 		this.x = x;

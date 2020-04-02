@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import ricochet.modele.Board;
@@ -74,6 +75,8 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 		} else if (key.getKeyCode() == KeyEvent.VK_DOWN) {
 			board.moveRobot(board.getMainRobot(), Direction.S);
 		}
+		if (board.isFinished())
+			JOptionPane.showMessageDialog(this, "Jeu Terminé");
 	}
 
 	@Override

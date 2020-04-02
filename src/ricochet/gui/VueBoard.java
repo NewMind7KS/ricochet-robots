@@ -3,7 +3,6 @@ package ricochet.gui;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import ricochet.modele.Board;
@@ -23,8 +22,8 @@ public class VueBoard extends JPanel implements EcouteurModele {
 		board.ajoutEcouteur(this);
 		GridLayout grid = new GridLayout(16, 16);
 		this.setLayout(grid);
-		for (int i = 0; i < board.getHeigth(); i++) {
-			for (int j = 0; j < board.getWidth(); j++) {
+		for (short i = 0; i < board.getHeigth(); i++) {
+			for (short j = 0; j < board.getWidth(); j++) {
 				cases.add(new VueCase(i, j, board));
 				this.add(cases.get(i * 16 + j));
 			}
@@ -39,9 +38,5 @@ public class VueBoard extends JPanel implements EcouteurModele {
 	public void modeleMisAJour(ModeleEcoutable source) {
 		for (VueCase vc : cases)
 			vc.updateContent();
-//		System.out.println("Mise à jour de la vue Board");
-//		if (board.isFinished())
-			//JOptionPane.showMessageDialog(this, "Jeu Terminé");
-			//System.out.println("----------Jeu Terminé-------------");
 	}
 }
