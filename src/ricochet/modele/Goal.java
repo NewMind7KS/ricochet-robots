@@ -2,7 +2,7 @@ package ricochet.modele;
 
 /**
  * Représentation d'un objectif (cible) de ricochet robot. Une cible possède sa
- * prorpe position sur le plateau de jeu. Elle ne change pas.
+ * propre position sur le plateau de jeu. Elle ne change pas.
  */
 public class Goal {
 

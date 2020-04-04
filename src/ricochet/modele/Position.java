@@ -25,7 +25,6 @@ public class Position {
 
 	/**
 	 * Création d'une position copie d'une autre position.
-	 * 
 	 * @param p Position copiée.
 	 */
 	public Position(Position p) {
@@ -63,6 +62,9 @@ public class Position {
 		return result;
 	}
 
+	/**
+	 * Redéfinition de la méthode "equals" qui permet maintenant de savoir si deux positions sont équivalentes.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

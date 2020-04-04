@@ -26,6 +26,9 @@ public enum Direction {
 		return values()[rand.nextInt(values().length)];
 	}
 
+	/**
+	 * Méthode qui donne un symbole pour une direction
+	 */
 	public static String symbol(Direction dir) {
 		switch (dir) {
 		case N:
@@ -41,6 +44,11 @@ public enum Direction {
 		}
 	}
 	
+	/**
+	 * Méthode qui donne la direction opposée de celle donnée en paramètre
+	 * @param dir une Direction
+	 * @return la Direction opposée 
+	 */
 	public static Direction opposite(Direction dir) {
 		switch (dir) {
 		case N:

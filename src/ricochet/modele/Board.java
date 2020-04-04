@@ -11,7 +11,7 @@ import java.util.Random;
 import ricochet.util.AbstractModeleEcoutable;
 
 /**
- * Classse représentant un plateau de Jeu de RIcochet Robot. Un plateau de 16
+ * Classse représentant un plateau de Jeu de Ricochet Robot. Un plateau de 16
  * cases sur 16 contenant des murs et des entités robots et objectifs. Un robot
  * principal doit se rendre sur la cible principale pour terminer le jeu.
  */
@@ -244,7 +244,7 @@ public class Board extends AbstractModeleEcoutable {
 	 * direction opposée.
 	 * 
 	 * @param x   Ligne dans le plateau
-	 * @param y   COlonne dans le plateau
+	 * @param y   Colonne dans le plateau
 	 * @param dir Direction de l'ajout du mur sur la case en position (x,y)
 	 */
 	public void addWall(int x, int y, Direction dir) {
@@ -413,16 +413,16 @@ public class Board extends AbstractModeleEcoutable {
 	}
 
 	/**
-	 * Retourne la liste complète des position d'arrivée possible pour un robot
-	 * donné à sa position acutelle sur le plateau de jeu. Les mouvements possibles
+	 * Retourne la liste complète des positions d'arrivées possible pour un robot
+	 * donné à sa position actuelle sur le plateau de jeu. Les mouvements possibles
 	 * d'un robot sont des déplacements d'au moins une case dans une des quatres
-	 * directions cardinales. Les positions renvoyées sont les position d'arrivée du
+	 * directions cardinales. Les positions renvoyées sont les positions d'arrivées du
 	 * déplacement.
 	 * 
-	 * @param r Robot étudié pour trouver tous ses mouvements possible à partir de
+	 * @param r Robot étudié pour trouver tous ses mouvements possibles à partir de
 	 *          sa position dans le plateau de jeu.
 	 * @return Liste complète des déplacements d'au moins une case possibles pour le
-	 *         robot r. Les positions sont les positions d'arrivée des mouvements.
+	 *         robot r. Les positions sont les positions d'arrivées des mouvements.
 	 */
 	public ArrayList<Position> getAllMoves(Robot r) {
 		ArrayList<Position> directions = new ArrayList<Position>();
@@ -434,15 +434,15 @@ public class Board extends AbstractModeleEcoutable {
 	}
 
 	/**
-	 * Retourne la liste complète des position d'arrivée possible pour une position
+	 * Retourne la liste complète des positions d'arrivées possible pour une position
 	 * donnée. Les mouvements possibles sont des déplacements d'au moins une case
 	 * dans une des quatres directions cardinales. Les positions renvoyées sont les
-	 * position d'arrivée du déplacement.
+	 * positions d'arrivées du déplacement.
 	 * 
-	 * @param position Position étudiée pour trouver tous les mouvements possible à
+	 * @param position Position étudiée pour trouver tous les mouvements possibles à
 	 *                 partir de cette position dans le plateau de jeu.
 	 * @return Liste complète des déplacements d'au moins une case possibles. Les
-	 *         positions sont les positions d'arrivée des mouvements.
+	 *         positions sont les positions d'arrivées des mouvements.
 	 */
 	public ArrayList<Position> getAllMoves(Position position) {
 		ArrayList<Position> directions = new ArrayList<Position>();
@@ -662,9 +662,9 @@ public class Board extends AbstractModeleEcoutable {
 
 	/**
 	 * Chargement du plateau de jeu contenu dans le fichier sous le nom de filename
-	 * donné dans le constructeur. Le plataeu est réinitialisé par rapport au
+	 * donné dans le constructeur. Le plateau est réinitialisé par rapport au
 	 * fichier donné. La séralisation des données permet d'enregistrer des parties
-	 * pour ensuite les récupérer. Le fichier et composé de lignes sur lesquelles
+	 * pour ensuite les récupérer. Le fichier est composé de lignes sur lesquelles
 	 * sont décomposées les informations. La strucuture est la suivante : coordX
 	 * coordY N S E W pour mettre les quatres murs à la case en position coordX et
 	 * coordY. Puis les entités sont sous forme de lettre avec R pour robots et G

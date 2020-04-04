@@ -1,5 +1,8 @@
 package ricochet.modele;
 
+/**
+ * Classe qui permet de lancer l'algorithme de résolution BFS
+ */
 public class Resolution {
 
 	public static void main(String[] args) {

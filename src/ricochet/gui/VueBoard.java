@@ -17,6 +17,10 @@ public class VueBoard extends JPanel implements EcouteurModele {
 	/** Plateau de jeu affiché */
 	private Board board;
 
+	/**
+	 * Constructeur de VueBoard. Permet d'avoir une vue sur les cases du plateau
+	 * @param board 
+	 */
 	public VueBoard(Board board) {
 		this.board = board;
 		board.ajoutEcouteur(this);

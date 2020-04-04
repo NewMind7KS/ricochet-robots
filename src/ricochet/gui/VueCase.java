@@ -16,11 +16,21 @@ import ricochet.modele.Position;
 public class VueCase extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	/** Permet de donner une dimension à une case */
 	private Dimension dimCase = new Dimension(42, 42);
+	/** Position x */
 	private short x;
+	/** Position y */
 	private short y;
+	/** un plateau de jeu */
 	private Board board;
 
+	/**
+	 * Constructeur de VueCase. 
+	 * @param x position sur les lignes
+	 * @param y position sur les colonnes
+	 * @param board 
+	 */
 	public VueCase(short x, short y, Board board) {
 		this.board = board;
 		this.setPreferredSize(dimCase);
@@ -28,6 +38,10 @@ public class VueCase extends JPanel {
 		this.y = y;
 	}
 
+	/**
+	 * Méthode qui permet de mettre en couleur le robot sélectionné ainsi que l'objectif principal
+	 * Ajoute aussi un trait pour chaque mur.
+	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

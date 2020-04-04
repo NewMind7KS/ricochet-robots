@@ -1,5 +1,8 @@
 package ricochet.modele;
 
+/**
+ * Classe qui permet de démarrer en ligne de commande le jeu de Ricochet Robot
+ */
 public class Start {
 
 	public static void main(String[] args) {

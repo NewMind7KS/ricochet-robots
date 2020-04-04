@@ -12,12 +12,20 @@ import javax.swing.JPanel;
 import ricochet.modele.Board;
 import ricochet.modele.Direction;
 
+/**
+ * Interface graphique du jeu de Ricochet Robot
+ */
 public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
+	/** Un plateau de jeu */
 	private Board board;
+	/** Un JPanel auquel on va ajouter un menu et un plateau */
 	private JPanel contentPane = new JPanel();
 
+	/**
+	 * Constructeur de l'interface graphique
+	 */
 	public RicochetGUI() {
 		this.board = new Board("dist/testBoard.txt");
 		this.board.takeGoal();
@@ -64,6 +72,9 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	public void windowOpened(WindowEvent arg0) {
 	}
 
+	/**
+	 * Méthode qui permet de jouer avec les flèches directionnelles du clavier
+	 */
 	@Override
 	public void keyPressed(KeyEvent key) {
 		if (key.getKeyCode() == KeyEvent.VK_LEFT) {

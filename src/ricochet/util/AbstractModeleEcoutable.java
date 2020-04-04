@@ -5,6 +5,7 @@ import java.util.List;
 
 public abstract class AbstractModeleEcoutable implements ModeleEcoutable {
 
+	/** Liste d'écouteurs du modèle */
 	private List<EcouteurModele> ecouteurs;
 
 	public AbstractModeleEcoutable() {
@@ -15,10 +16,18 @@ public abstract class AbstractModeleEcoutable implements ModeleEcoutable {
 		ecouteurs = list;
 	}
 
+	/**
+	 * Ajout d'un écouteur sur le modèle
+	 * @param e Ecouteur
+	 */
 	public void ajoutEcouteur(EcouteurModele e) {
 		ecouteurs.add(e);
 	}
 
+	/**
+	 * Retrait d'un écouteur sur le modèle
+	 * @param e Ecouteur
+	 */
 	public void retraitEcouteur(EcouteurModele e) {
 		ecouteurs.remove(e);
 	}

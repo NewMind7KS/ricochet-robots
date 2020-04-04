@@ -7,18 +7,15 @@ import java.util.LinkedList;
 
 /**
  * Breadth First Search algorithme Test de toutes les combinaisons possible à
- * partir de l'état initial du plateau de jeu. Il est garantie de trouver une
+ * partir de l'état initial du plateau de jeu. Il est garanti de trouver une
  * solution au problème. Mais gourmand en ressource et en temps suivant la
  * profondeur de recherche. Chaque noeud possède 2 ou 3 mouvements possibles. Ce
- * type de recherche permet de donner à coup sur le chemin le plus court pour se
- * rendre sur la cible. La première solution trouvée est forcement le chemin le
+ * type de recherche permet de donner à coup sûr le chemin le plus court pour se
+ * rendre sur la cible. La première solution trouvée est forcément le chemin le
  * plus court. La recherche s'effectue à partir du root (état initial) puis tous
- * ses children sont testés. Si aucun ne termine le jeu, les enfants de chaque
- * children sont générés puis testés. Le temps de résolution est proportionnel à
- * la complexité de la solution (l nombre de mouvements requis).
- * 
- * @author alex
- *
+ * ses "children" sont testés. Si aucun ne termine le jeu, les enfants de chaque
+ * "children" sont générés puis testés. Le temps de résolution est proportionnel à
+ * la complexité de la solution (le nombre de mouvements requis).
  */
 public class BFSSearch implements Runnable {
 
@@ -30,7 +27,7 @@ public class BFSSearch implements Runnable {
 
 	private HashMap<Robot, Position> originalPosition = new HashMap<Robot, Position>();
 
-	/** Profondeur maximum de recherche */
+	/** Profondeur maximale de recherche */
 	public byte profondeur = 5;
 
 	/**
@@ -58,7 +55,7 @@ public class BFSSearch implements Runnable {
 	 * board. De même la cible est la mainGoal du Board. L'état initial donne toutes
 	 * les possibilités pour les profondeurs de recherche suivantes. La recherche
 	 * s'arrête à la profondeur maximum en attribut. Sur chaque profondeur, tous les
-	 * état sont testés pour déterminer si la partie est terminée. Chaque état est
+	 * états sont testés pour déterminer si la partie est terminée. Chaque état est
 	 * une classe interne State.
 	 * 
 	 * @return Liste des mouvements pour arriver au but
@@ -113,8 +110,6 @@ public class BFSSearch implements Runnable {
 	 * direction de mouvement pour un robot donné ainsi qu'un State qui l'a généré.
 	 * Ce principe permet de consommer peu de mémoire en ne stockant pas le board
 	 * entier modifié, mais plus gourmand en ressources de calcul.
-	 * 
-	 * @author alex
 	 */
 	class State {
 
@@ -160,7 +155,7 @@ public class BFSSearch implements Runnable {
 
 		/**
 		 * Méthode permettant de jouer tous les coups depuis le premier noeud parent en
-		 * suivant le chemin parcouru pour arriver à l'état acutel. Chaque état du
+		 * suivant le chemin parcouru pour arriver à l'état actuel. Chaque état du
 		 * chemin comporte un robot à jouer et une direction pour ce dernier.
 		 */
 		public void playPath() {
@@ -247,9 +242,6 @@ public class BFSSearch implements Runnable {
 	/**
 	 * Mouvement effectué sur le plateau représenté par un robot concerné et une
 	 * direction.
-	 * 
-	 * @author alex
-	 *
 	 */
 	class Move {
 

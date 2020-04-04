@@ -17,15 +17,28 @@ import ricochet.util.ModeleEcoutable;
 public class VueMenu extends JPanel implements EcouteurModele {
 
 	private static final long serialVersionUID = 1L;
+	/** Un plateau de jeu */
 	private Board board;
+	/** Bouton pour afficher un plateau en ligne de commande */
 	private JButton printBoard;
+	/** Bouton pour enregistrer un plateau */
 	private JButton writeBoard;
+	/** Bouton pour utiliser l'algorithme de BFS */
 	private JButton BFSSearch;
+	/** Bouton pour utiliser l'algorithme A* */
 	private JButton astar;
+	/** Bouton pour réinitialiser le plateau */
 	private JButton reset;
+	/** Liste des positions des robots */
 	private JComboBox<Object> liste;
+	/** Liste des positions des objectifs */
 	private JComboBox<Object> liste2;
 
+	/**
+	 * Constructeur de VueMenu. 
+	 * Ajoute les différents boutons et listes d'objets
+	 * @param board
+	 */
 	public VueMenu(Board board) {
 		this.setLayout(new GridLayout(10, 2));
 		this.board = board;
@@ -60,6 +73,10 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		liste2.setFocusable(false);
 	}
 
+	/**
+	 * Lors de la mise à jour de la Vue, 
+	 * les composants de cette dernière se mettent à jour
+	 */
 	@Override
 	public void modeleMisAJour(ModeleEcoutable source) {
 //		text.setText("Robot : " + board.getMainRobot() + ", Goal : " + board.getMainGoal());
@@ -67,6 +84,9 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		liste2.repaint();
 	}
 
+	/**
+	 * Classe interne qui permet d'utiliser les boutons et les listes d'objets
+	 */
 	class ActionButton implements ActionListener {
 
 		@Override

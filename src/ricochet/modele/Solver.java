@@ -7,22 +7,36 @@ import java.util.Map.Entry;
 
 public class Solver implements Runnable {
 
+	/** Liste fermée */
 	private ArrayList<Node> closedList;
+	/** Liste ouverte */
 	private ArrayList<Node> openList;
+	/** Un plateau de jeu */
 	private Board board;
+	/** Un array list contenant un hashmap listant toutes les possibilités de solution */
 	private ArrayList<HashMap<Position, Integer>> allPossibilities = new ArrayList<HashMap<Position, Integer>>();
 
+	/**
+	 * Constructeur du solver. Initialise une liste ouverte et une liste fermée
+	 * @param board
+	 */
 	public Solver(Board board) {
 		this.board = board;
 		closedList = new ArrayList<Node>();
 		openList = new ArrayList<Node>();
 	}
 	
+	/**
+	 * Lance l'algorithme A*
+	 */
 	@Override
 	public void run() {
 		astar();
 	}
 
+	/**
+	 * Lancement de la résolution de A*
+	 */
 	public void solve() {
 		System.out.println("Lancement de A start une première fois");
 		ArrayList<Position> ast = astar();
@@ -44,6 +58,10 @@ public class Solver implements Runnable {
 		System.out.println(tmp);
 	}
 
+	/**
+	 * Algorithme qui permet de résoudre Ricochet Robot suivant l'algorithme A*. 
+	 * @return
+	 */
 	public ArrayList<Position> astar() {
 		closedList.clear();
 		openList.clear();
@@ -119,6 +137,11 @@ public class Solver implements Runnable {
 		return null;
 	}
 
+	/**
+	 * Méthode récursive qui permet d'ajouter les différents mouvements possibles d'une solution.
+	 * @param c profondeur
+	 * @param path Le chemin déjà parcouru 
+	 */
 	public void addMoves(int c, HashMap<Position, Integer> path) {
 		HashMap<Position, Robot> moves = new HashMap<Position, Robot>();
 		for (Robot r : board.getRobots()) {
@@ -156,24 +179,32 @@ public class Solver implements Runnable {
 		}
 	}
 
+	/**
+	 * Classe interne représentant un noeud.
+	 */
 	class Node implements Comparable<Node> {
 
+		/** Position x */
 		private short x;
+		/** Position y */
 		private short y;
+		/** Cout de se rendre sur ce noeud depuis son ancêtre */
 		private int cout;
+		/** coût heuristique(distance entre le noeud et la position de la cible) */
 		private int heuristique;
+		/** Noeud ancêtre */
 		private Node ancestor;
 
 		/**
 		 * Noeud de l'algorithme A*, un Noeud est une future position sur le plateau de
 		 * Jeu pour le robot principal. Pour se rendre à ce noeud à partir de la
-		 * position actuelle, c'est sa distance qui le sépare de son ancètre.
+		 * position actuelle, c'est sa distance qui le sépare de son ancêtre.
 		 * L'heuristique est la distance de cette position à l'emplacement de la cible
 		 * principale sur le plateau.
 		 * 
 		 * @param x           Position x
 		 * @param y           Position y
-		 * @param cout        Cout de se rendre sur ce noeud depuis son ancètre
+		 * @param cout        Cout de se rendre sur ce noeud depuis son ancêtre
 		 *                    (distance)
 		 * @param heuristique Distance entre ce noeud et la position de la cible sur le
 		 *                    plateau
@@ -187,6 +218,9 @@ public class Solver implements Runnable {
 			this.ancestor = ancestor;
 		}
 
+		/**
+		 * Retourne un noeud et ses paramètres
+		 */
 		public Node(Position p, int cout, int heuristique, Node ancestor) {
 			this(p.getX(), p.getY(), cout, heuristique, ancestor);
 		}

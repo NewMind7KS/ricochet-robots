@@ -1,7 +1,7 @@
 package ricochet.modele;
 
 /**
- * Représentation d'un robotde ricochet robot. Un robot possède sa propre
+ * Représentation d'un robot de Ricochet Robot. Un robot possède sa propre
  * position sur le plateau de jeu. Elle peut changer suivant ses déplacements.
  */
 public class Robot {
