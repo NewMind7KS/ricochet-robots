@@ -1,3 +1,9 @@
 bin/
 /.classpath
 /.project
+.settings/
+rapport/Rapport_latex.aux
+rapport/Rapport_latex.log
+rapport/Rapport_latex.out
+rapport/Rapport_latex.synctex.gz
+rapport/Rapport_latex.toc
