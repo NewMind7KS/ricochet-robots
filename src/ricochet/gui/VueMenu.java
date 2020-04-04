@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import ricochet.modele.BFSSearch;
 import ricochet.modele.Board;
+import ricochet.modele.NewFile;
 import ricochet.modele.Solver;
 import ricochet.util.EcouteurModele;
 import ricochet.util.ModeleEcoutable;
@@ -33,6 +34,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	private JComboBox<Object> liste;
 	/** Liste des positions des objectifs */
 	private JComboBox<Object> liste2;
+	private JButton newRandomFile;
 
 	/**
 	 * Constructeur de VueMenu. 
@@ -71,6 +73,11 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		reset.setFocusable(false);
 		liste.setFocusable(false);
 		liste2.setFocusable(false);
+		
+		newRandomFile = new JButton("Créer un plateau aléatoire");
+		newRandomFile.addActionListener(new ActionButton());
+		add(newRandomFile);
+		newRandomFile.setFocusable(false);
 	}
 
 	/**
@@ -110,6 +117,9 @@ public class VueMenu extends JPanel implements EcouteurModele {
 			else if (ae.getSource() == astar) {
 				Thread th = new Thread(new Solver(board));
 				th.start();
+			}
+			else if (ae.getSource() == newRandomFile) {
+				board.addFile("hello.txt");
 			}
 		}
 	}

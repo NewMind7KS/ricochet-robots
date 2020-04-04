@@ -18,6 +18,8 @@ public class Case {
 	/** Boolean : si actif présence d'un mur dans la case à l'Ouest */
 	private boolean wallW = false;
 
+	private boolean Verrou;
+	private boolean blackCase = false;
 	/**
 	 * Ajout d'un mur dans la direction donnée.
 	 * 
@@ -86,4 +88,114 @@ public class Case {
 		str = wallS ? str + "S" : str + " ";
 		return str;
 	}
+
+	public boolean isVerrou() {
+		return Verrou;
+	}
+
+	public void setVerrou(boolean verrou) {
+		Verrou = verrou;
+	}
+
+	public boolean isBlackCase() {
+		return blackCase;
+	}
+
+	public void setBlackCase() {
+		this.blackCase = blackCase;
+	}
+    public boolean isMur() {
+        return (wallN || wallS || wallE || wallW);
+    }
+
+    /**
+     * Création d'un angle sur la case en fonction de l'angle donné.
+     * 
+     * @param direction Entier qui donne la position de l'angle sur la case
+     */
+    public void faireAngle(int direction) {
+            switch (direction) {
+            case 0:
+                    this.setWall(Direction.N);
+                    this.setWall(Direction.W);
+                    break;
+            case 1:
+                    this.setWall(Direction.N);
+                    this.setWall(Direction.E);
+                    break;
+            case 2:
+                    this.setWall(Direction.S);
+                    this.setWall(Direction.W);
+                    break;
+            case 3:
+                    this.setWall(Direction.S);
+                    this.setWall(Direction.E);
+                    break;
+            default:
+                    System.err.println("Erreur de clé dans la méthode faireAngle" + direction);
+                    System.exit(1);
+                    break;
+            }
+    }
+    
+    /**
+     * Retourne vrai si un mur est présent sur la case dans la direction donnée.
+     * 
+     * @param direction Côté de la case où le mur est
+     * @return Retourne vrai si un mur est présent sur la case dans la direction.
+     */
+    public boolean isMur(Direction direction) {
+            switch (direction) {
+            case N:
+                    return this.wallN;
+            case S:
+                    return this.wallS;
+            case W:
+                    return this.wallW;
+            case E:
+                    return this.wallE;
+            default:
+                    return false;
+            }
+    }
+
+	public boolean isWallN() {
+		return wallN;
+	}
+
+	public void setWallN(boolean wallN) {
+		this.wallN = wallN;
+	}
+
+	public boolean isWallS() {
+		return wallS;
+	}
+
+	public void setWallS(boolean wallS) {
+		this.wallS = wallS;
+	}
+
+	public boolean isWallE() {
+		return wallE;
+	}
+
+	public void setWallE(boolean wallE) {
+		this.wallE = wallE;
+	}
+
+	public boolean isWallW() {
+		return wallW;
+	}
+
+	public void setWallW(boolean wallW) {
+		this.wallW = wallW;
+	}
+	
+	public void setAllWalls(boolean wall){
+		setWallW(wall);
+		setWallN(wall);
+		setWallE(wall);
+		setWallS(wall);
+	}
+	
 }

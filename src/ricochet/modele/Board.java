@@ -43,8 +43,14 @@ public class Board extends AbstractModeleEcoutable {
 	/** Cible principale : doit être atteinte par le robot principal */
 	private Goal mainGoal;
 
-	/** Nom du fichier contenant la description du plataeu de jeu */
+	/** Nom du fichier contenant la description du plateau de jeu */
 	private String filename;
+	public static int HAUTEUR = 16;
+	public static int LARGEUR = 16;
+	public static int MILIEU_BAS = (HAUTEUR / 2) - 1;
+	public static int MILIEU_HAUT = HAUTEUR / 2;
+	protected Random rand;
+
 
 	/**
 	 * Création du plateau de jeu par rapport à un nom de fichier donné. Il y a 256
@@ -57,6 +63,7 @@ public class Board extends AbstractModeleEcoutable {
 		this.robots = new ArrayList<Robot>();
 		this.goals = new ArrayList<Goal>();
 		this.cases = new Case[16][16];
+		this.rand = new Random();
 		loadBoard();
 	}
 
@@ -732,4 +739,203 @@ public class Board extends AbstractModeleEcoutable {
 		takeGoal();
 		notifyListener();
 	}
+	
+	public void addFile(String filename){
+		/*try {
+			File myFile = new File("./"+filename);
+			if (myFile.createNewFile()){
+				System.out.println("Fichier créé");
+			} 
+			else{
+				System.out.println("Fichier pas créé");
+			}
+		}
+		catch (IOException e){
+				System.out.println("Error");
+		}*/
+		robots.clear();//enlève les robots
+		goals.clear();//enlève les objectifs
+		cleanWalls();//enlève tous les murs
+        this.setMursExternes();//rajoute les murs externes
+        this.setAnglesObjectifs();//rajoute les angles
+        printBoard();//rajoute les objectifs et les robots
+        			//on enregistre tout
+        			//on notifie le changement
+        //this.finirMurs();
+        //this.ajoutRobots();
+        //loadBoard();
+      //notifyListener();
+	}
+	
+	public void cleanWalls(){
+		for (int i=0;i < HAUTEUR; i++){
+			for (int j = 0; j < LARGEUR; j++){
+				this.cases[i][j].setAllWalls(false);
+			}
+		}
+	}
+    private void setMursExternes() {
+        /*
+         * Le placement d'un mur verrouille les cellules voisines pour éviter qu'un
+         * autre puisse se coller.
+         */
+        // Placement des murs sur les 4 bords externes
+        for (int i = 0; i < HAUTEUR; i++) {
+        	this.cases[i][0].setWall(Direction.W);
+            this.cases[i][LARGEUR - 1].setWall(Direction.E);
+        }
+        for (int j = 0; j < LARGEUR; j++) {
+                this.cases[0][j].setWall(Direction.N);
+                this.cases[HAUTEUR - 1][j].setWall(Direction.S);
+        }
+        this.cases[MILIEU_HAUT][MILIEU_BAS].setBlackCase();
+        this.cases[MILIEU_HAUT][MILIEU_HAUT].setBlackCase();
+        this.cases[MILIEU_BAS][MILIEU_HAUT].setBlackCase();
+        this.cases[MILIEU_BAS][MILIEU_BAS].setBlackCase();
+        // On verrouille les cellules centrales qui ne pourront pas avoir d'angles
+        for (int i = 6; i < 10; i++) {
+                for (int j = 6; j < 10; j++) {
+                        this.cases[i][j].setVerrou(true);
+                }
+        }
+        /*
+         * Placement des murs simples, 1 par quart de plateau collé aux cotés externes
+         * et perpendiculaire. Les cases voisines des murs simples sont verrouillés sur
+         * un seul axe.
+         */
+        int m = 0, n = 0, r = 0;
+        for (int i = 0; i < 2; i++) {
+                r = rand.nextInt(6) + 2;
+                this.cases[m][r].setWall(Direction.W);
+                this.cases[m][r - 1].setWall(Direction.E);
+                if (m == 0) {
+                        this.cases[m + 1][r - 1].setVerrou(true);
+                        this.cases[m + 1][r].setVerrou(true);
+                } else {
+                        this.cases[m - 1][r - 1].setVerrou(true);
+                        this.cases[m - 1][r].setVerrou(true);
+                }
+                r = rand.nextInt(6);
+                this.cases[m][r + 8].setWall(Direction.W);
+                this.cases[m][r + 7].setWall(Direction.E);
+                if (m == 0) {
+                        this.cases[m + 1][r + 8].setVerrou(true);
+                        this.cases[m + 1][r + 7].setVerrou(true);
+                } else {
+                        this.cases[m - 1][r + 8].setVerrou(true);
+                        this.cases[m - 1][r + 7].setVerrou(true);
+                }
+                m = HAUTEUR - 1;
+        }
+        for (int j = 0; j < 2; j++) {
+                r = rand.nextInt(6) + 2;
+                this.cases[r][n].setWall(Direction.N);
+                this.cases[r - 1][n].setWall(Direction.S);
+                if (n == 0) {
+                        this.cases[r][n + 1].setVerrou(true);
+                        this.cases[r - 1][n + 1].setVerrou(true);
+                } else {
+                        this.cases[r][n - 1].setVerrou(true);
+                        this.cases[r - 1][n - 1].setVerrou(true);
+                }
+                r = rand.nextInt(6);
+                this.cases[r + 8][n].setWall(Direction.N);
+                this.cases[r + 7][n].setWall(Direction.S);
+                if (n == 0) {
+                        this.cases[r + 8][n + 1].setVerrou(true);
+                        this.cases[r + 7][n + 1].setVerrou(true);
+                } else {
+                        this.cases[r + 8][n - 1].setVerrou(true);
+                        this.cases[r + 7][n - 1].setVerrou(true);
+                }
+                n = LARGEUR - 1;
+        }
+        
+    }
+    
+    private void setAnglesObjectifs() {
+        boolean anglesup = false;
+        // Coordonnées tirées au hasard
+        int x = 0, y = 0;
+        // Coordonées de la cellule en cours
+        int m = 0, n = 0;
+        // On parcours chaque quart de terrain
+        for (int i = 0; i < 4; i++) {
+                switch (i) {
+                case 1:
+                        n = 8;
+                        break;
+                case 2:
+                        m = 8;
+                        break;
+                case 3:
+                        n = 0;
+                        break;
+                }
+                // On met en place les 4 angles sur des positions autorisées puis on verrouilles
+                // les cellules voisines.
+                for (int j = 0; j < 4; j++) {
+                        // Permet de faire un 17eme angle sur le premier quart de terrain
+                        if (!anglesup) {
+                                j--;
+                                anglesup = true;
+                        }
+                        x = rand.nextInt(8);
+                        y = rand.nextInt(8);
+                        while (this.cases[x + m][y + n].isMur() || this.cases[x + m][y + n].isVerrou()) {
+                                x = rand.nextInt(8);
+                                y = rand.nextInt(8);
+                        }
+                        // Choix de la direction de l'angle aléatoire
+                        this.cases[x + m][y + n].faireAngle(rand.nextInt(4));
+                        
+                        
+                        /*
+                         * A optimiser dans une boucle, mise en place d'un verrou tout autour des angles
+                         * pour éviter qu'ils sont collés à d'autres.
+                         */
+                /*
+                        this.cases[x + m - 1][y + n - 1].setVerrou(true);
+                        this.cases[x + m][y + n - 1].setVerrou(true);
+                        this.cases[x + m + 1][y + n - 1].setVerrou(true);
+                        this.cases[x + m - 1][y + n].setVerrou(true);
+                        this.cases[x + m + 1][y + n].setVerrou(true);
+                        this.cases[x + m - 1][y + n + 1].setVerrou(true);
+                        this.cases[x + m][y + n + 1].setVerrou(true);
+                        this.cases[x + m + 1][y + n + 1].setVerrou(true);
+                        // Création de la cible, elle est placée dans l'angle et ajoutée à l'attribut
+                        // cibles avec sa position.
+                     //Goal cible = new Goal();
+                        // On ne place pas directement les cibles sur le plateau mais on sauvegarde leur
+                        // position dans un hashmap cibles.
+                     //this.cibles.put(cible, new Position((x + m), (y + n)));
+                }*/
+        }
+    }
+
+    /**
+     * Parcours du tableau pour mettre tous les murs manquants. Si un mur est sur
+     * une case au nord, un mur doit être présent au sud dans la case du dessus.
+     */
+    private void finirMurs() {
+            for (int i = 1; i < 15; i++) {
+                    for (int j = 1; j < 15; j++) {
+                            if (this.cases[i][j].isMur(Direction.N)) {
+                                    this.cases[i - 1][j].setWall(Direction.S);
+                            }
+                            if (this.cases[i][j].isMur(Direction.E)) {
+                                    this.cases[i][j + 1].setWall(Direction.W);
+                                    ;
+                            }
+                            if (this.cases[i][j].isMur(Direction.S)) {
+                                    this.cases[i + 1][j].setWall(Direction.N);
+                                    ;
+                            }
+                            if (this.cases[i][j].isMur(Direction.W)) {
+                                    this.cases[i][j - 1].setWall(Direction.E);
+                                    ;
+                            }
+                    }
+            }
+    }
 }
