@@ -22,6 +22,9 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	private Board board;
 	/** Un JPanel auquel on va ajouter un menu et un plateau */
 	private JPanel contentPane = new JPanel();
+	/** Un compteur pour comptabiliser le nombre de coups joué dans une partie*/
+	private static int compteur = 0;
+
 
 	/**
 	 * Constructeur de l'interface graphique
@@ -41,6 +44,15 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 		contentPane.add(new VueMenu(board));
 		this.addKeyListener(this);
 		this.pack();
+	}
+	
+	
+	public static int getCompteur() {
+		return compteur;
+	}
+
+	public static void setCompteur(int compteur) {
+		RicochetGUI.compteur = compteur;
 	}
 
 	@Override
@@ -78,16 +90,29 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent key) {
 		if (key.getKeyCode() == KeyEvent.VK_LEFT) {
-			board.moveRobot(board.getMainRobot(), Direction.W);
+			//board.moveRobot(board.getMainRobot(), Direction.W);
+			if (board.moved(board.getMainRobot(), Direction.W)) {
+				RicochetGUI.compteur++;
+			}
 		} else if (key.getKeyCode() == KeyEvent.VK_UP) {
-			board.moveRobot(board.getMainRobot(), Direction.N);
+			//board.moveRobot(board.getMainRobot(), Direction.N);
+			if (board.moved(board.getMainRobot(), Direction.N)) {
+				RicochetGUI.compteur++;
+			}
 		} else if (key.getKeyCode() == KeyEvent.VK_RIGHT) {
-			board.moveRobot(board.getMainRobot(), Direction.E);
+			//board.moveRobot(board.getMainRobot(), Direction.E);
+			if (board.moved(board.getMainRobot(), Direction.E)) {
+				RicochetGUI.compteur++;
+			}
 		} else if (key.getKeyCode() == KeyEvent.VK_DOWN) {
-			board.moveRobot(board.getMainRobot(), Direction.S);
+			//board.moveRobot(board.getMainRobot(), Direction.S);
+			if (board.moved(board.getMainRobot(), Direction.S)) {
+				RicochetGUI.compteur++;
+			}
 		}
+		System.out.println("Nbre coups : " + RicochetGUI.compteur);
 		if (board.isFinished())
-			JOptionPane.showMessageDialog(this, "Jeu Terminé");
+			JOptionPane.showMessageDialog(this, "Jeu Terminé en " + getCompteur() + " coups");
 	}
 
 	@Override

@@ -418,6 +418,21 @@ public class Board extends AbstractModeleEcoutable {
 		}
 		return false;
 	}
+	
+	
+	/**
+	 * Détermine si un robot r a effectué un mouvement dans une direction dir donné
+	 * @param r : Robot qui va effectuer le déplacement
+	 * @param dir : direction dans laquelle le robot va se déplacer
+	 * @return true si le robot s'est déplacé et false sinon
+	 */
+	public boolean moved(Robot r, Direction dir) {
+		if (canMoveInDir(r.getPositionRobot(), dir)) {
+			moveRobot(r, dir);
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Retourne la liste complète des positions d'arrivées possible pour un robot
@@ -911,6 +926,7 @@ public class Board extends AbstractModeleEcoutable {
                      //this.cibles.put(cible, new Position((x + m), (y + n)));
                 }*/
         }
+        	}
     }
 
     /**

@@ -1,16 +1,18 @@
 package ricochet.gui;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import ricochet.modele.BFSSearch;
 import ricochet.modele.Board;
-import ricochet.modele.NewFile;
 import ricochet.modele.Solver;
 import ricochet.util.EcouteurModele;
 import ricochet.util.ModeleEcoutable;
@@ -34,6 +36,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	private JComboBox<Object> liste;
 	/** Liste des positions des objectifs */
 	private JComboBox<Object> liste2;
+	private JLabel compteur;
 	private JButton newRandomFile;
 
 	/**
@@ -74,6 +77,13 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		liste.setFocusable(false);
 		liste2.setFocusable(false);
 		
+		compteur = new JLabel("Nombre de coups : " + RicochetGUI.getCompteur());
+		compteur.setFont(new Font("Courrier New", Font.BOLD + Font.ITALIC, 12));
+		compteur.setForeground(Color.BLACK);
+		compteur.setHorizontalAlignment(JLabel.CENTER);
+		add(compteur);
+		
+		
 		newRandomFile = new JButton("Créer un plateau aléatoire");
 		newRandomFile.addActionListener(new ActionButton());
 		add(newRandomFile);
@@ -89,6 +99,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 //		text.setText("Robot : " + board.getMainRobot() + ", Goal : " + board.getMainGoal());
 		liste.repaint();
 		liste2.repaint();
+		compteur.setText("Nombre de coups : " + (RicochetGUI.getCompteur()+1));
 	}
 
 	/**
@@ -108,8 +119,11 @@ public class VueMenu extends JPanel implements EcouteurModele {
 				Thread th = new Thread(search);
 				th.start();
 			}
-			else if (ae.getSource() == reset)
+			else if (ae.getSource() == reset) {
 				board.loadBoard();
+				RicochetGUI.setCompteur(0);
+				compteur.setText("Nombre de coups : " + 0);
+		}
 			else if (ae.getSource() == liste)
 				board.setMainRobot(board.getRobots().get(liste.getSelectedIndex()));
 			else if (ae.getSource() == liste2)
