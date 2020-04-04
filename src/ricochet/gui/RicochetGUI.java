@@ -19,7 +19,7 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	private JPanel contentPane = new JPanel();
 
 	public RicochetGUI() {
-		this.board = new Board("testBoard2.txt");
+		this.board = new Board("dist/testBoard.txt");
 		this.board.takeGoal();
 		this.board.takeRobot();
 		this.setTitle("Ricochet Robot");

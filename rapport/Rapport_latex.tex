@@ -10,84 +10,84 @@
 \usepackage[dvipsnames]{xcolor}%importe les couleurs, l'option permet d'avoir encore plus de couleurs
 \usepackage{sectsty}%permet de changer les couleurs des sections/titres, etc
 \usepackage{tikz}%pour faire des figures
-\definecolor{astral}{RGB}{46,116,181}
-\sectionfont{\color{red}}
-\subsectionfont{\color{Blue}}
-\subsubsectionfont{\color{NavyBlue}}
 \usepackage{appendix} % Pour l'annexe
-
-\title{\vspace*{5cm}
-\LARGE{\em{Rapport Conception logicielle avancée}}\\
-Solveur de Ricochet Robots\\\vspace*{0.5cm}
-UE Conception de Logiciels\\
-Licence Informatique
-}
-\author{
-Elie Malbec - Alex Lefevre -  Yoann Kablan - Vouvou Brandon\\
-Groupe 1B
-}
-
-\date{2019 - 2020}
+\usepackage[linesnumbered,ruled, french,onelanguage]{algorithm2e}
 
 \begin{document}
-\maketitle
+\makeatletter
+  \begin{titlepage}
+  \centering
+      {\large \textsc{Université de Caen Normandie}}\\
+      \textsc{Licence informatique 2\up{ème} année}\\
+    \vspace{1cm}
+      \includegraphics[width=0.25\textwidth]{images/unicaen.jpg}\\
+    \vspace{1cm}
+      {\large\textbf{	\@date\\
+       Rapport Conception logicielle avancée}}\\
+    \vfill
+       {\LARGE \textbf{
+       Solveur de Ricochet Robot}}\\
+    \vspace{2em}
+        {\large Lefevre Alex \& Malbec Elie \& Kablan Yoann \& Vouvou Brandon} \\
+    \vfill
+       \includegraphics[height=0.4\textheight]{images/visuBoard.png}
+     \vfill
+  \end{titlepage}
+\makeatother
 \newpage
 \tableofcontents
 \newpage
 
 \section{Introduction}
-Dans le cadre de l'unité d'enseignement Conception Logicielle Avancée, nous avons formé un groupe de quatre étudiants : Alex Lefevre, Elie Malbec, Yoann Kablan, Brandon Vouvou pour créer un solveur de Ricochet Robots.
+	\subsection{Introduction}
+Dans le cadre de l'unité d'enseignement Conception Logicielle Avancée enseignée à l'Université de Caen en licence 2\up{ème} année, nous avons réalisé un solveur du jeu Ricochet Robot. Nous avons formé un groupe de quatre étudiants : Alex Lefevre, Elie Malbec, Yoann Kablan et Brandon Vouvou pour concevoir une IA (intelligence artificielle) résolvant le jeu. Dans ce rapport, nous vous exposons les démarches qui nous ont permis de concevoir un algorithme de résolution ainsi que les difficultés rencontrées durant son élaboration.
 
-Le choix du sujet s'est fait naturellement, le concept du jeu et la réalisation d'un solveur nous ont motivés.
+Notre réflexion portée sur le concept du jeu et sa méthode de résolution nous ont motivés pour le sélectionner parmi les autres.
 
-Le langage de programmation imposé est le Java.
+Notons également une contrainte imposée pour le développement, le langage de programmation imposé est le Java.
 
-\section{Description du jeu et des objectifs}
 	\subsection{Le jeu Ricochet Robot}
-Ricochet Robot est un jeu de plateau carré composé de pions robots et de tuiles objectifs. Le but est de trouver la séquence de mouvements nécessaires pour emmener le robot principal sur un objectif. Cependant, chaque déplacement ne peut se faire qu'en ligne droite jusqu'au prochain obstacle. Chaque case du plateau peut comporter des murs faisant office d'obstacle.
+Ricochet Robot est dans sa version originale un jeu de plateau composé d'une grille de taille $16*16$. Chacune des 256 cases est représentée par une paire de coordonnées $(x,y)$. Une case peut comporter des murs à gauche, à droite, en haut et en bas faisant office d'obstacle de déplacement aux quatre entités appelées \textit{robots}. La grille est délimitée par une bordure de murs extérieurs. Les murs sont appelés suivant leur direction : murs 'nord', 'sud', 'est' et 'ouest'. Quatre cases au centre du jeu forment une zone noire et ne sont pas accessibles.
 
-Une partie démarre par le tirage au sort d'une cible parmi les dix-sept présentes sur le plateau. Un robot est également tiré, il devra se rendre sur cet objectif pour terminer le jeu.
+Les robots sont des entités placées aléatoirement sur le plateau du jeu. Deux robots ne peuvent pas être présents sur la même case au même moment ni dans les cases centrales. Chaque robot peut se déplacer suivant les directions cardinales jusqu'à ce qu'il rencontre un obstacle, ce dernier peut être de deux types : un mur ou un autre robot. Pour un robot placé sur une case, il lui est impossible de se déplacer sur la droite si la case sur laquelle il est possède un mur à l'Est. 
 
-Il est possible de déplacer les trois autres robots pour arriver à la destination. Le but du jeu est de résoudre ce puzzle avec le moins de mouvements possible dans un temps limité. C'est également le but de notre projet.
+De multiples cibles sont également placées dans les angles formés par deux murs. Un des robots dit robot principal doit atteindre la cible principale pour terminer le jeu. Les mouvements des robots annexes peuvent servir au robot principal pour créer de nouveaux obstacles de déplacement. Le but est de se rendre sur la cible principale avec le moins de mouvements possible.
+
+Chaque position sur la jeu peut être représentée par des coordonnées sur un plan deux dimensions. Voici les positions utilisées, elles correspondent à l'indexation des objets avec la structure de tableau à double dimension.
+
+\begin{figure}[htpb]
+\centering
+  \begin{tikzpicture}[scale=0.4]
+  \draw[step=1cm,gray,very thin] (0,0) grid (16,16); 
+  \draw[ultra thick,->] (0,16) -- (0,0);
+  \draw[ultra thick,->] (0,16) -- (16,16);
+  \draw[thick] (0,0) -- (16,0);
+  \draw[thick] (16,0) -- (16,16);
+  \fill (7,7) rectangle (9,9);
+  \foreach \k in {15,14,...,0}
+  	{\node at (-0.8,15-\k+0.5) {\k};}
+  \foreach \k in {0,1,...,15}
+  	{\node at (\k+0.5,16.8) {\k};}
+  \end{tikzpicture}
+  \caption{Coordonnées sur le plateau de jeu}
+\end{figure}
+
+Il y a 17 cibles sur le plateau, donc 17 tours de jeu dans le jeu original, cependant, dans notre cas, nous n'avons pas mis en place ces règles de jeu mais uniquement la méthode de résolution et la possibilité de jouer en interface graphique.
 
 	\subsection{Objectif du solveur}
 L'objectif de la résolution du jeu est de minimiser le nombre de déplacements nécessaires pour permettre au robot principal de se rendre sur l'objectif. Plusieurs solutions permettent d'arriver au résultat mais certaines sont plus rapides.
 
-Nous avons ainsi développer une algorithme résolvant le puzzle et minimisant le nombre de coups suivant une complexité de calcul donnée. Toute situation de jeu permet de trouver une solution au problème.
+Chaque robot déplacé compte pour un mouvement. Le fait de changer la position de robots annexes apporte de nouvelles possibilités. Nous avons développés deux manières de résoudre ce problème, chaque méthode comporte des avantages et des inconvénients que nous détaillerons par la suite. La complexité du problème réside dans le nombre de déplacements possible à chaque état de jeu. Un nombre exponentielle de d'états s'ajoutent à chaque mouvement.
 
 \section{Développement du moteur de jeu}
-	\subsection{Modèle physique}
-		\subsubsection{Le plateau de jeu}
-Le modèle physique du jeu repose sur un plateau découpé en 256 cases reparties sur 16 lignes et 16 colonnes. Ces cases comportent à la fois des murs qui bloquent les mouvements et des entités.
-Les murs sont situés dans les quatre directions cardinales et délimitent à la fois la terrain de jeu avec une bordure extérieure et forment des angles entre eux pour y placer les objectifs.
-Il y a quatre robots et dix-sept objectifs (cibles) sur la version officielle.
+La première étape pour la réalisation de ce projet était de concevoir le modèle du jeu. Pour cela, un premier package \texttt{modele} comporte l'ensemble des classes nécessaires à sa modélisation.
 
-Le terrain de jeu est en réalité découpé en quatre sous terrains de 8 lignes et 8 colonnes. Le placement de ces derniers et leur rotation apporte de nombreuses configurations de jeu, mais toujours solvables.
+	\subsection{Plateau du jeu}
+Pour modéliser le plateau, nous avons développé une classe \texttt{Board}. Cette dernière est constituée de 256 cases et représente l'état actuel du jeu. Les entités sont représentées par des classes \texttt{Robot} et \texttt{Goal}. Les robots et cibles ne sont pas directement placés sur le plateau mais possèdent leur propre position. Cela permet de ne pas vérifier dans chaque case la présence de telle ou telle entité.
 
-Pour notre projet, nous nous sommes tenus de respecter la configuration du jeu officiel en utilisant quatre robots et dix-sept objectifs. Le plateau de jeu est quand à lui soit chargé depuis le plateau officiel, soit généré aléatoirement.
+Les robots et les cibles sont stockés dans des listes avec la structure de donnée \texttt{ArrayList}. Des références au robot principal et à la cible principale permettent de les distinguer des autres.
 
-		\subsubsection{Déplacements internes}
-Les déplacements des robots sur le plateau doivent suivre les quatre directions cardinales : Nord, Sud, Est et Ouest. Un robot ne peut se déplacer dans la case adjacente uniquement si aucun mur ne bloque le déplacement sur sa position mais également qu'aucun robot n'est présent sur la case adjacente.
-
-Un objectif sur une case ne constitue pas un obstacle pour un déplacement.
-
-Notons que bouger un robot permet de créer un nouvel obstacle à une certaine position du jeu pouvant aider à la résolution. À chaque robot déplacé, un mouvement supplémentaire est comptabilisé.
-
-	\subsection{Modèle informatique}
-		\subsubsection{Plateau du jeu}
-Pour le modèle informatique du plateau, nous avons développé une classe \texttt{Board}. Cette dernière est constituée de 256 cases et représente l'état actuel du jeu. Les entités sont représentées par des classes \texttt{Robot} et \texttt{Goal}. Chaque robot ou cible ne sont pas directement placés dans une case mais ils possèdent leur position sur le plateau de jeu sous forme de coordonnées $x$ et $y$.
-Les coordonnées dans le plateau suivent le graphique \ref{coordPlateau}.
-
-\begin{figure}[!h]
-	\begin{center}
-	\includegraphics[scale=0.5]{./images/board.png}
-	\caption{Plateau de jeu sous forme de coordonnées}\label{coordPlateau}
-	\end{center}
-\end{figure}
-
-Les robots et les objectifs (cibles) sont stockées dans des listes avec la structure \texttt{ArrayList}. Des références au robot principal et à la cible principale permettent de les distinguer des autres.
-
-La construction du plateau de jeu est basée sur un fichier texte, il donne pour chaque coordonnée les murs et entités présentes (cf:\ref{structFichier}). Cette construction est par défaut basée sur celle du plateau de jeu officiel. Mais il est possible de générer un plateau aléatoirement ou de choisir un fichier de configuration.
+La construction du plateau de jeu est basée sur un fichier texte, ce fichier contient des coordonnées et une description des murs et des entités présentes (\ref{structFichier}). Cette construction est par défaut basée sur celle du plateau de jeu officiel. Mais il est possible de générer un plateau aléatoirement ou de choisir un autre fichier de configuration.
 
 Voici le diagramme de classe donnant les principales méthodes utilisées sur le plateau mais également la structure des robots et cibles.
 
@@ -98,7 +98,7 @@ Voici le diagramme de classe donnant les principales méthodes utilisées sur le
 	\end{center}
 \end{figure}
 
-Le plateau dispose de méthodes qui lui permettent de bouger les robots, de tester si le jeu est terminé mais aussi de tirer une nouvelle cible ou un nouveau robot. Les directions sont listées depuis une énumération et les positions représentés avec deux coordonnées pour un plan deux dimensions.
+Le plateau dispose de méthodes qui lui permettent de bouger les robots, de tester si le jeu est terminé mais aussi de tirer une nouvelle cible ou un nouveau robot aléatoirement. Les directions sont listées depuis une énumération et les positions représentées avec deux coordonnées pour un plan deux dimensions.
 
 Nous pouvons également remarquer que les 256 cases sont des objets \texttt{Case} stockées dans un double tableau. Cela permet un accès direct aux données mais aussi un parcours simplifié avec une largeur et une hauteur connue. La composition d'une case est la suivante :
 \begin{figure}[htpb]
@@ -110,8 +110,8 @@ Nous pouvons également remarquer que les 256 cases sont des objets \texttt{Case
 
 Les quatre murs possibles sont par défaut désactivés puis activés avec la méthode \texttt{setWall} dans la direction donnée. Une fois les murs mis en place, ils ne changent plus durant la partie.
 
-		\subsubsection{Déplacements internes}
-Concernant les déplacements, les méthodes \texttt{moveRobot} et \texttt{getAllMoves} requiert des tests supplémentaires. Il faut vérifier que les déplacement sont valides et donner les position d'arrivée quand un obstacle est rencontré. Pour cela, des méthodes ont été implémentées dans la classe \texttt{Board} dont voici le diagramme :
+	\subsection{Déplacements}
+Concernant les déplacements, les méthodes \texttt{moveRobot} et \texttt{getAllMoves} nécessitent des tests supplémentaires. Il faut vérifier que les déplacement sont valides et donner les position d'arrivée quand un obstacle est rencontré. Pour cela, des méthodes ont été implémentées dans la classe \texttt{Board} dont voici le diagramme :
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -120,10 +120,10 @@ Concernant les déplacements, les méthodes \texttt{moveRobot} et \texttt{getAll
 	\end{center}
 \end{figure}
 
-Les déplacements sont ainsi possibles en donnant un robot et une direction à la méthode \texttt{moveRobot} et le déplacement est effectué. C'est à dire que la position d'arrivée est déterminée suivant la direction puis le robot concerné voit sa position modifiée.
+Les déplacements sont ainsi possibles en donnant spécifiant un robot et une direction à la méthode \texttt{moveRobot}. La position d'arrivée est renvoyée et le déplacement est effectué en mettant à jour la position du robot concerné. Notons également qu'une cible ne constitue pas un obstacle à un mouvement.
 
-	\subsection{Visualisation d'un plateau de jeu}
-Pour permettre les tests et rendre le jeu plus visuel, une interface graphique à été développée en suivant le modèle Modèle Vue Contrôleur. Les murs sont représentés par des traits et les entités sont placées par rapport à leurs coordonnées respectives. Le robot principal est coloré en rouge et la cible principale en vert. Cette visualisation permet de mieux voir les données comparativement à une lecture descriptive sous forme textuelle.
+	\subsection{Visualisation du jeu}
+Pour permettre de jouer au clavier et rendre le jeu plus visuel, une interface graphique à été développée en suivant le schéma MVC (Modèle Vue Contrôleur). Les murs sont représentés par des traits et les entités sont placées par rapport à leurs coordonnées respectives. Le robot en cours de déplacement est coloré en rouge et la cible principale en vert. Cette visualisation permet de mieux voir les données comparativement à une lecture sous forme textuelle.
 La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board}.
 
 \begin{figure}[htpb]
@@ -133,45 +133,172 @@ La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board}.
 	\end{center}
 \end{figure}
 
+	\subsection{Détails de l'implémentation}
+Lors du développement de ce modèle de jeu, nous avons eu des difficultés quand aux structures de données à utiliser. L'utilisation du gestionnaire de version Git nous à permit de créer plusieurs versions plus ou moins stables du modèle. Dans un premier temps, nous avions décidé de placer les entités directement dans les cases du plateau de jeu. Cette méthode était très difficile à maintenir car les positions des entités étaient stockées dans des \texttt{HashMap}.
 
-\section{Fonctionnalités implémentées}
+Nous avons par la suite abandonné ce système pour réaliser une seconde implémentation du modèle. Dans cette dernière, nous avons gardés la structure des cases, c'est à dire quatre attributs correspondants au murs possibles. Un ensemble de méthode ont été créées pour générer des plateaux aléatoires. C'est sur cette version que sera basée la prochaine utilisant les algorithmes de résolution.
 
-\subsection{DESCRIPTION  DES FONCTIONNALITÉS }
-Au cours du projet , de multiples fonctionnalités ont été implémentées...Pour commencer nous avons implémenté le jeu et sa structure c'est-à-dire le plateau et tous les éléments qui le constitue ce plateau sont un plateau de n*m objets de types cases qui ont comme attribut quatre booléens qui sont ici nos murs. Ce plateau est constitué de plusieurs éléments c'est-à-dire les murs qui sont placés de façon aléatoire ou chargé à partir d’un fichier ces murs sont comme toute logique non traversable et formant souvent des angles qui contiennent souvent ou pas des cibles . Ensuite nous avons implémenté les différentes entités du jeu : les robots qui sont dotés de plusieurs attributs dont la position  et l’identifiant ils ont aussi la possibilité de se déplacer en ligne droite uniquement  ensuite les cibles qui ont les mêmes attributs que les robots qui sont entre autres la position et l’identifiant ainsi dans le plateau de jeu une de ses cibles est considéré comme  l'objectif principal . Nous avons accompagné cela d’une interface graphique là où il est possible d'afficher le plateau présent dans la console, enregistrer le plateau  ensuite  d’exécuter l’algorithme A* et enfin de remettre à zéro le plateau. Notre jeu ne se joue pas en console bien qu’il soit possible d’afficher le plateau de jeu avec des robots et même des déplacements dans la console.puis enfin de l’algorithme de résolution A* qui partant de la position de départ d’un robot trouve les positions intermédiaires jusqu’à la résolution du jeu . 
+\section{Méthodes de résolution}
+	Dans cette partie, nous allons voir les deux algorithmes utilisés pour la résolution du jeu. Il s'agit de l'algorithme \textsl{A*} et de \textsl{BFS} (Breadth First Search). Chaque méthode possède des avantages et des inconvénients que nous allons détailler ci-dessous.
+	
+	\subsection{Historique du projet}
+Durant le développement du projet, nous nous sommes tout d'abord penchés sur l'algorithme de résolution \textsl{A*}. Ce dernier possède un avantage théorique car il limite le nombre d'état possible grâce à une heuristique de plateau. L'implémentation de \textsl{A*} à nécessité l'utilisation de méthodes définies dans la classe \texttt{Board}. Cependant nous avons eu beaucoup de mal à trouver une heuristique cohérente permettant de trouver la solution. Après certaines recherches, nous avons décidés de se pencher sur l'algorithme \textsl{BFS}, ce dernier néglige la mémoire au profit de trouver une solution rapide. C'est cette méthode qui nous à donné le plus de résultats cohérents.
 
+Pour mettre en place ces résolutions, une dernière version du modèle à été mise en place, avec des entités robots et cibles qui possèdent leur propre position. Cela permet de les déplacer virtuellement sur le jeu tout en ne stockant que ces positions pour les différents états.
 
-		\subsubsection{ ORGANISATION DU PROJET 
-}
-L'organisation du projet s'est déroulée en plusieurs étapes importantes, la première concerne la structure du projet. Les premières séances ont été consacrées au choix du projet. Après cela fallait commencer par coder le plateau et les éléments qui le constituent Bien avant d’avoir commencé à coder ensemble le jeu  Élie avait déjà une implémentation du plateau de jeu, ainsi Lors de la deuxième séance de Travaux pratiques  nous avons commencé à coder le plateau et les éléments qui le constituent c'est-à-dire les murs et les autres entités nous créons alors la première version de notre  jeu ricochets robot qui était la version robot 1.1 travail qui fut validé par tous les membres du groupe.Par la suite Alex a avancé sur la structuration du plateau  pendant que Yoann et Élie  commençaient à implémenter les déplacements des robots et les possibilités de déplacements des robots dans le plateau . Après plusieurs implémentions et test nous avons réuni nos idées pour finaliser cela. Une première version du projet était fonctionnelle en console et permettait déjà de :  choisir la cible principale de façon aléatoire, de sélectionner le robot principal, d’effectuer des déplacements, de charger un plateau prédéfini, de générer un plateau avec des constituants placés aléatoirement tout en respectant les normes du jeu.Après cette phase, Nous nous sommes directement penchés sur l’interface graphique partie où les connaissances d’Alex nous ont beaucoup aidés. À partir de ce moment , le projet s’est scindé en deux parties : Alex travaillait sur l’interface pendant que le reste du groupe travaillait sur l’implémentation de l’algorithme A* .
-Après cela , nous avons joint la partie graphique au modèle ainsi la deuxième version de notre jeu fut crée "Robot1.2".Après cela Elie et Yoann avait une ébauche de l'algorithme mais qui ne fonctionnait pas correctement,Alex et Brandon se sont ainsi penchés sur cette partie du travail et c'est comme sa que tous ensemble avons réussi a implémenter l'algorithme .
-Puis enfin Alex a proposé une nouvelle structure du code que nous avons adopté par la suite car nous la trouvons plus souple car elle simplifie et clarifie notre code. 
-(………………………………….)
+	\subsection{Algorithme A*}
+		\subsubsection{Principe}
+L'algorithme \textsl{A*} est un algorithme de recherche de chemin dans un graphe entre un nœud initial et un nœud final.	Dans notre cas, le nœud initial est l'état de base du plateau de jeu, les nœuds intermédiaires les possibles chemins empruntés par les robots et le nœud final l'état du jeu terminé.
+Cet algorithme utilise une évaluation heuristique pour déterminer le meilleur chemin pour se rendre sur la cible. 
 
-\section{ÉLÉMENTS  TECHNIQUE }	
-\subsubsection{ALGORITHMES}
-L'algorithme de résolution de notre jeux se nomme A*. C'est un algorithme de recherche de chemin dans un graphe entre un nœud initial et un nœud final tous les deux donnés.Cet algorithme fut crée par Peter E.Hart Nils John Nilso et Betram Raphael en 1968, cet algorithme est en réalité une extension de l'algorithme de Djikstra qui fut proposé en 1959 qui est aussi un algorithme de recherche.
-Dans le cas de notre ricochet robots il s'agissait de rechercher le chemin le plus court pour chaque robot d'arriver a la cible,ainsi le nœud de départ avait comme position un des robots du jeu  et le nœud final avait comme position la cible principale qui est l'objectif qui est tiré de façon aléatoire.Ainsi l'objectif est un objet de type "Goal" qui a comme attribut une position et un identifiant et qui est sélectionné dans la classe Board avec les méthodes takeGoal() et getMainGoal() qui réutilise la méthode précédente , ensuite nous avons une classe nommée Solver la ou nous implémentons l'algorithme.Comme l'algorithme le dit nous commençons d'abord par créer la liste ouverte et la liste fermée qui sont ici deux ArrayList d'objet de type "Node" qui sont des objets d'une classe interne dont les attributs sont: la position ,l'heuristique et le noeud ancêtre qui est le nœud qui a permis d’accéder au nœud actuel. Ainsi dans la classe "Board" nous calculons directement l'heuristique du nœud de départ qui serra utilisé par la suite dans l'algorithme.Pour commencer nous initialisons la position de départ qui est la position du robot a étudier et la position d'arrivée qui est la position de l'objectif , ensuite nous initialisons les nœuds de départ et d'arrivée puis nous initialisons une variable booléenne "insert" qui nous sert a (.............)  ,on récupère le nœud avec la plus petite valeur on le fait grâce a la méthode min qui est utilise pour renvoyer l'élément minimum d'une collection donnée, selon l'ordre induit par le comparateur spécifié,ainsi il est plus nécessaire de trier les éléments de la liste ouverte en ordre décroissant.Après on commence par itérer tant que le liste ouverte n'est pas vide en récupérant le nœud minimum de la liste puis on effectue le déplacement lié a la position du nœud étudié on itère jusqu’à ce que la position du nœud soit égal à la position de la cible dans la cas on ajoute tous les enfants du nœud étudié dans la liste fermé a la liste fermées en vérifiant que ces enfants ne sont pas dans la liste fermée ou s'ils n'existent pas dans la liste ouverte  avec
-une valeur inférieure.Après on crée encore un nouveau nœud qui a comme position la position du mouvement venant d’être effectué puis on compare sa valeur au même nœud dans la liste ouverte en vérifiant si sa valeur est plus basse dans la liste fermé si oui on l'ajoute a la liste ouverte. A partir du moment ou la liste ouverte est vide cela veut dire que : il n'y a pas de chemin possible pour le robot pour se rendre sur la cible.
-(………………… A COMPLÉTER ……………….)
-
-\subsubsection{STRUCTURES DE DONNÉES }
-Structure du fichier contenant les données pour le chargement d'un plateau de jeu.\label{structFichier}
-
-(………………… A COMPLÉTER ……………….)
-
-\subsubsection{BIBLIOTHÈQUES}
-Les bibliothèques nous permettent d'utiliser des méthodes qui faciliteront la programmation du programme.
-Dans ce projet nous avons utiliser uniquement deux bibliothèques majeures notamment pour l'interface graphique qui sont : \begin{itemize}
-\item AWT : (Abstract Windows Toolkit) qui permet d'écrire des interfaces graphiques indépendantes du système d'exploitation.
-\item SWING : Nous utilisons aussi cette bibliothèque dans la gestion ou la modélisation de notre interface graphique ,elle a un but similaire a celui de AWT mais avec des modes de fonctionnement différent. 
+Nous avons du réaliser une structure de nœud avec une relation d'ordre suivant leur évaluation. En effet, l'évaluation d'un nœud $n$ est notée $f(n)$. La fonction d'évaluation $f(n)$ est un nombre réel positif ou nul, estimant le cout du meilleur chemin du nœud initial passant par n et arrivant au but. $f(n)$ se décompose en deux parties : $f(n) = g(n) + h(n)$
+\begin{itemize}
+\item $g(n)$ le coût du meilleur chemin ayant mené au nœud $n$ depuis le nœud initial.
+\item $h(n)$ est une fonction d'estimation du coût restant entre un nœud $n$ d'un graphe et le but.
 \end{itemize}
-(………………… A COMPLÉTER ……………….)
 
-\section{ARCHITECTURES DU PROJET }
-\subsubsection{ Architecture globale des dossiers et des fichiers}
+Ici $g(n)$ est définie par la somme des distances de Manhattan de la position du nœud $n$ à la cible $goal$. Cette somme défini le coût nécessaire pour se rendre à ce nœud depuis l'origine.
+Pour $h(n)$, nous avons utilisé la distance de Manhattan du robot principal à la cible. Cette évaluation vaut 0 si le robot atteint la cible et est maximisée si le robot est loin de la cible.
+
+\textsl{A*} est optimal si l'heuristique $h(n)$ ne surestime jamais le coût pour se rendre au nœud suivant $n'$ et si les nœuds enfants possèdent une heuristique plus basse que celle du nœud courant.
+
+Cet algorithme à besoin d'une liste dite $open$ qui contient les nœuds pas encore traités : i.e. la frontière de la partie du graphe explorée jusqu'à maintenant. Les nœuds sont triées selon l'estimé $f(n)$ la fonction d'évaluation. On explore les nœuds les plus prometteurs en premier. Et d'une liste dite $closed$ qui contient les nœuds déjà traités, i.e. à l'intérieur de la frontière délimitée par $open$.
+
+	\subsubsection{Implémentation}
+Pour implémenter cet algorithme, nous avons créer une classe \texttt{Solver} suivant un état du jeu donné. Les nœuds implémentent l'interface \texttt{Comparable} permettant d'établir une relation d'ordre entre eux. Les listes $open$ et $closed$ sont des \texttt{ArrayList<Node>}. Chaque nœud contient une position du robot principal.
+Le diagramme de classe associé est la figure \ref{solverDiag};
+
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.4]{./images/solver.png}
+	\caption{Diagramme de la classe Solver}\label{solverDiag}
+	\end{center}
+\end{figure}
+
+En suivant l'exécution de cet algorithme, nous pouvons trouver une solution n'impliquant que le robot principal. Cette résolution fonctionne si le chemin pour se rendre à la cible est direct. Cependant cela ne garantie pas qu'il s'agit du chemin optimum (avec peu de coups).
+
+Nous avons donc tentés d'ajouter les mouvements des autres robots dans la liste $open$ après chaque coup joué avec différentes heuristiques : 
+\begin{itemize}
+\item Distance de Manhattan entre le robot principal et la cible
+\item Somme des distances de tous les robots à la cible
+\item Distance de Manhattan minimum après tous les coups possibles pour le robot principal
+\end{itemize} 
+Mais aucune ne permet de résoudre le jeu car des coups sont joués jugés bons par leur valeur mais en réalité bloquants, inutiles ou inverses.
+Il est très difficile de donner un poids différent à chaque état de jeu. Ce constat s'est confirmé par plusieurs rapports qui estiment que chaque mouvement (et donc chaque lien dans l'arbre) à un poids équivalent si c'est un robot annexe qui est déplacé.
+Dans ce cas précis, la distance entre le robot principal et la cible principale ne change pas, tous les nœuds auront la même valeur, l'algorithme en choisira un au hasard et le jouera. Mais ce ne sera pas forcement un coup utile à la résolution.
+
+Ce type d'algorithme n'est pas performant pour ce jeu, les déplacements sont effectués dans des directions et peuvent éloigner le robot pour qu'au coup suivant il atteigne sa cible. Toute la difficulté réside dans la création d'une heuristique complexe faisant intervenir des état futurs.
+
+Nous avons en conséquence réalisé un \textsl{A*} déplaçant uniquement le robot principal.
+
+		\subsubsection{Remarques}
+L'algorithme \textsl{A*} permet de résoudre rapidement un chemin direct pour se rendre sur la cible. Mais dans la plupart des cas, ce chemin n'existe pas et le déplacement de robots secondaires est nécessaires. Il n'y a donc aucune garantie quand au résultat. De plus, le chemin peut contenir plus de mouvements que nécessaire, ne donnant pas pleine satisfaction par rapport au but de notre projet.
+
+	\subsection{Algorithme BFS (Breadth First Search)}
+		\subsubsection{Principe}	
+Dans une recherche en largeur, il faut commencer à la racine $root$ qui est l'état initial. Puis ajouter tous les enfants $child$ de $root$ dans une liste depuis les mouvements possible. Pour chaque état $child$, pris l'un après l'autre, nous testons si c'est un état final, i.e. un jeu terminé dans notre cas avec le robot sur sa cible. Si aucun état final n'est rencontré dans tous les état $child$, génération de tous les états de niveau 2 à partir de chaque $child$. Une nouvelle liste d'état de niveau 2 est testée et ainsi de suite.
+
+Si un état final est rencontré, remonter le chemin jusqu'à la racine $root$.
+
+Cette méthode de résolution garantie un résultat rapidement, mais au détriment de la mémoire. De plus, la première solution est garantie d'être la solution optimum.
+
+Le nombre d'état est exponentiel, ce que pose des problèmes de mémoire et empêche la résolution de long chemins. À l'état initial, il y a 4 robots qui peuvent se déplacer dans 4 directions, cela apporte 16 possibilités. Puis en profondeur 2, pour chacun des 16 cas, il y a 2 à 3 mouvements possibles pour chaque robot. L'optimisation de cet algorithme peut résider d'éviter les mouvements inverses mais aussi de déplacer en premier le robot principal.
+
+		\subsubsection{Implémentation}
+Ricochet Robot est un problème complexe à résoudre, le nombre de cas augmente très rapidement dès la profondeur 6. Nous avons choisi de choisir ce algorithme car il permet de résoudre plus de situations de jeu. Mais les performances de notre modèle nous empêchent de trouver des chemins de plus de 5 mouvements en raison de manque de mémoire et d'optimisation. Chaque état est stocké suivant la classe interne \texttt{State} contenue dans la classe \texttt{BFSSearch}, figure \ref{bfs}.
+
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.3]{./images/bfssearch.png}
+	\caption{Diagramme de classe BFSSearch}\label{bfs}
+	\end{center}
+\end{figure}
+
+Ainsi, la mémoire utilisée pour stocker un état de jeu est assez fiable, un lien avec tous les ancêtres depuis l'état courant permet de tracer le chemin parcouru par tous les robots depuis le plateau de base contenu dans la classe \texttt{BFSSearch}. Par exemple, pour savoir si l'état est considéré comme terminé, il faut reconstituer le chemin depuis l'origine, puis jouer chaque coup depuis le plateau de base. Ensuite vérifier si le robot est sur la cible, enfin reconstituer le plateau de base en réinitialisant les positions des robots depuis \texttt{originalPosition}.
+
+Pour gagner du temps lors de l’exécution il serait possible de déterminer les positions d'arrivée à chaque état et de placer directement le robot à cet endroit à la place de réaliser les multiples tests de déplacement.
+
+Le temps nécessaire pour trouver un chemin est assez court pour des résolutions en 5 mouvements, mais au delà il faut une puissance de calcul supplémentaire et de la mémoire. En effet, chaque état est stocké en mémoire, une optimisation viserait à supprimer ces états et les retrouver en chemin inverse.
+
+		\subsubsection{Détails}
+Le pseudo-code de l'algorithme BFS est l'algorithme \ref{algobfs}.
+
+\begin{algorithm}
+\DontPrintSemicolon
+\SetAlgoVlined
+\KwIn{Plateau initial $Board$ $b$}
+\KwOut{Liste chaînée de $Move$ pour la résolution}
+$Bool$  $finished \gets false$\;
+$State$  $root \gets b$\;
+$Add$ $root$ to $nodes$ $list$\; 
+\While{$finished=false$} {
+	new $list$ $childs$\;
+	\For{State s in nodes}{
+	add all $childs(s)$ to $childs$ $list$\;
+	}
+	\For{State s in childs}{
+		\If{$isFinished(s)$}{
+			\Return{$path(s)$}
+		}
+	}
+	$nodes \gets childs$\;
+}
+\Return{$null$}\;
+\caption{{\sc Search} Algorithme BFS de résolution}
+\label{algobfs}
+\end{algorithm}
+
+	\subsection{Conclusion}
+Nous avons eu l'occasion d'implémenter deux algorithmes de recherche. L'un d'eux, \textsl{A*} n'est pas une solution viable sans une heuristique complexe utilisant les états futurs. Mais cette méthode à l'avantage d'être très rapide en explorant uniquement les cas jugés utiles. Nous n'avons pas réussi à déterminer cette heuristique. De plus, le chemin trouvé n'est pas forcement le chemin optimum.
+
+Le second algorithme nous a cependant permis de résoudre une partie du problème, des améliorations pourraient lui être apportées pour explorer des chemins plus complexes et coûteux en mémoire. Cette méthode à l'avantage de trouver la bonne solution la plus rapide pour arriver au but. Sa complexité est exponentielle et son temps d'exécution assez rapide car la majorité des solutions se trouvent en moins de 6 déplacements.
+
+Pour ouvrir sur d'autres possibilités, l'algorithme DFS (Deep First Searching) est une exploration en profondeur qui nécessite peu de mémoire au détriment du temps de résolution. Les branches sont explorées jusqu'au dernier nœud possible (avant de faire des mouvements arrières).
+
+\section{Fonctionnalités implémentées et architecture}
+	\subsection{Interface graphique}
+	Une interface graphique\up{\ref{interface}} permet de visualiser l'état d'un plateau de jeu. Le choix de la cible s'effectue via une liste déroulante, de même pour le robot colorié en rouge. Il est possible de déplacer le robot en cours dans la direction souhaitée par l'appui sur les flèches directionnelles.
+	Chaque action entraîne la mise à jour de l'interface graphique conformément à la structure MVC. Un message s'affiche lors de la résolution du jeu.
+	Des boutons permettent de lancer les algorithmes de recherche pour trouver une solution au problème actuel. C'est à dire pour permettre au robot de se rendre sur la cible.
+	La remise à zéro du plateau est un rechargement du fichier de configuration du jeu officiel.
+
+\begin{figure}[htpb]
+	\begin{center}
+	\includegraphics[scale=0.3]{./images/interface.png}
+	\caption{Interface de jeu}\label{interface}
+	\end{center}
+\end{figure}
+
+	\subsection{Génération aléatoire de plateau}
+La génération aléatoire de plateau créé un fichier qui pourra être chargé comme plateau de jeu. Sa génération repose sur certaines règles :
+\begin{itemize}
+\item Création d'un bordure extérieure du jeu.
+\item Création d'un mur sur chaque coté de chaque quart de terrain.
+\item Quatre cases centrales inaccessibles.
+\item Création de 17 angles formés par des murs, ne devant ni toucher les cases centrales, ni les bordures extérieures, ni d'autres angles. Il y a 4 angles par quart de terrain et 1 autre placé aléatoirement.
+\item Placement des cibles dans les angles
+\item Placement aléatoire de 4 robots, jamais dans la même case.
+\end{itemize}
+
+Il est également possible d'enregistrer le plateau courant depuis l'interface graphique pour reprendre une configuration.
+
+		\subsubsection{Format du fichier de configuration}\label{structFichier}
+Le fichier contenant les données de configuration d'un plateau de jeu est composé de la manière suivante :
+\begin{enumerate}
+\item Coordonnée x de la case
+\item Coordonnée y de la case
+\item Description de la case avec des espaces entre chaque caractéristique :
+\begin{itemize}
+\item N S E W pour les murs
+\item R G pour les robots et cibles
+\end{itemize}
+\end{enumerate}
+Par exemple, \textsl{0 0 W N R} donne pour la case en position $(0,0)$ un mur à l'Ouest, un mur au Nord et un Robot.
+
+Il est possible d'ajouter d'autres robots et de nouvelles cibles en ajoutant de nouvelles lignes de configuration. Elles peuvent être mélangées.
+
+	\subsection{Architecture du projet}
 Voici l'architecture de notre projet :
-
-
 
 \makeatletter
 \newcount\dirtree@lvl
@@ -203,17 +330,13 @@ Voici l'architecture de notre projet :
   }
 }
 
-
-
-
-
 \begin{figure}[h]
 \begin{center}
-\begin{tikzpicture}[dirtree]
+\begin{tikzpicture}[dirtree,scale=0.7]
  	    
 \node {src} 
     child { node {ricochet }
-    	child { node {gui}    		 
+    	child { node {gui} 
     		child { node {RicochetGUI.java
 			} }
     		child { node {Start.java
@@ -224,7 +347,7 @@ Voici l'architecture de notre projet :
 			} }
 			child { node {VueMenu.java
 			} }
-    }    		
+    }
     	child { node {modele}    		 
     		child { node {Board.java
 			} }
@@ -242,80 +365,47 @@ Voici l'architecture de notre projet :
 			} }
 			child { node {Start.java
 			} }
-    }    
-    	child { node {util}    		 
+			child { node {BFSSearch.java
+			} }
+    }
+    	child { node {util} 		 
     		child { node {AbstractModeleEcoutable.java
 			} }
     		child { node { EcouteurModele.java
 			} }
    			child { node {ModeleEcoutable.java
-			} }				   
-   	    }}    	       	     
+			} }
+   	}
+   		child { node {dist}    		 
+    		child { node {board.txt
+			} }
+    }}    	       	     
     ;   
 \end{tikzpicture}
 \end{center}
 \caption{Arborescence des dossiers}
 \end{figure}
-\subsubsection{Architecture des modules et des classes}
+
+\section{Expérimentations}
+	\subsection{Comparaison du temps de calcul}
+	\subsection{Nombre de nœuds explorés}
+
+
+\section{Conclusion}
+Ce projet à été très formateur pour l'ensemble du groupe, nous avons pu découvrir certaines pratiques algorithmiques intéressantes. La gestion du projet avec une succession de versions permet à chacun d'essayer certaines méthodes sans impacter le tronc commun. La question de l'heuristique dans des graphes est complexe et nécessite de l'expérience. De plus, ce projet est perfectible, par une série d'améliorations possible :
 \begin{itemize}
-\item Le projet est reparti en trois  parties mais avec deux paquet majeur, nous avons la partie modèle dans le package "ricochet.modele" : 
-
-Au sein de cette partie ou de ce package nous retrouvons la classe "Board" qui est l'épicentre de notre projet, elle utilise l'ensemble des classes du projet afin de réutiliser tous ces éléments dans l’implémentation des fonctionnalités elle utilise plus ou moins l'intégralité des classes du package qui est composé notamment de la classe "Case" ,"Direction" ,"Goal" , "Position", "Robot" , "Solver" et enfin le main : "Start".Nous avons aussi dans ce package la classe  ou nous implémentons l'algorithme "Solver" elle utilise notamment la méthode de calcul de l'heuristique dans la classe "Board" ou encore le "getAllMoves" pour les mouvements des robots.
-
-\item La seconde partie est notamment la partie graphique composé des classes nous permettant d'avoir la vue du menu et l'affichage du plateau de jeu qui sont englobées dans la classe "RicochetGUI" qui réutilise les classes "VueCase", "VueBoard" et "VueMenu".
+\item Mise en place d'un timer de jeu pour limiter le temps de résolution à la fois pour un joueur humain et pour les algorithmes.
+\item Ajout de scores pour un jeu multijoueur.
+\item Réalisation d'un éditeur de plateau graphique.
+\item Amélioration des algorithmes de recherche, notamment le BFS.
+\item Sélection des cibles et robots au clic de la souris et amélioration de l'interface graphique.
 \end{itemize}
 
-
-(………………… A COMPLÉTER ……………….)
-
-\subsubsection{CHAÎNES DE TRAITEMENT }
-Le traitement de données renvoie à une série de processus qui permettent d'extraire de l'information ou de produire un rendu a partir de données brutes.Dans le cas de notre projet le rendu est sous forme d'une interface graphique bien que certaines données peuvent être transcrites dans la console , ainsi le traitement se fait comme suit: à partir du main nous créons uniquement un nouvel objet de la classe "RicochetGUI", qui dans le traitement :
-Crée une fenêtre puis charge un plateau puis charge l'affichage de ce plateau , ensuite ajoute le menu a l'interface puis ajoute les écouteur afin de mettre à jour puis enfin affiche l'interface,par la suite le reste des opérations tel que les déplacements des robots , la sélection aléatoire de la cible principale est prise ainsi que l'algorithme de résolution se fait par le biais des classe "Board" et "Solver" du package "ricochet.modele" en utilisant aussi les autres classe du package.  
-(………………… A COMPLÉTER ……………….)
-
-
-\section{EXPÉRIMENTATIONS ET USAGES }
-\subsubsection{CAPTURES D’ÉCRANS }
-\begin{itemize}
-\item L'aspect final de notre application se présente comme tel :
-
-\begin{figure}
-
-\end{figure}
-
-
-\item Voici un exemple plateau a charger:
-
-\begin{figure}
-
-\end{figure}
-
-\item Voici comment se présente une fin de partie : 
-\begin{figure}
-
-\end{figure}
-
-\end{itemize}
-
-
-
- 
-
-(………………… A COMPLÉTER ……………….)
-
-
-
-\subsubsection{ MESURES DE PERFORMANCES }
-
-(………………… A COMPLÉTER ……………….)
-
-\section{CONCLUSION}
-\subsubsection{RÉCAPITULATIF DES FONCTIONNALITÉS PRINCIPALES }
-
-(………………… A COMPLÉTER ……………….)
-\subsubsection{PROPOSITIONS D’AMÉLIORATIONS }
-
-(………………… A COMPLÉTER ……………….)
-
+\begin{thebibliography}{9}
+\bibitem{ref1} Hugo Larochelle, chercheur en apprentissage automatique et chercheur chze Google Brain. \url{http://info.usherbrooke.ca/hlarochelle/cours/ift615_E2013/contenu.html}
+\bibitem{ref2} Course:CPSC:Artificial Intelligence/States and Searching, The University of British Columbia \url{https://wiki.ubc.ca/Course:CPSC:Artificial_Intelligence/States_and_Searching}
+\bibitem{ref3} A Case Studu for Human Complex Problem Solving, 15 Septembre 2005
+\bibitem{ref4} MoutainWest RubyConf 2015 - Solving Ricochet Robots \url{https://www.youtube.com/watch?v=fvuK0Us4xC4}
+\end{thebibliography}
 \end{document} %fin du document
 
