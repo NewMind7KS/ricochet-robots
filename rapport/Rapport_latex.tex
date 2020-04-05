@@ -42,11 +42,7 @@
 	\subsection{Introduction}
 Dans le cadre de l'unité d'enseignement Conception Logicielle Avancée enseignée à l'Université de Caen en 2\up{ème} année de licence d'informatique, nous avons réalisé un solveur du jeu Ricochet Robot en Java. Nous avons formé un groupe de quatre étudiants : Alex Lefevre, Elie Malbec, Yoann Kablan et Brandon Vouvou pour concevoir une IA (intelligence artificielle) résolvant le jeu. Dans ce rapport, nous vous exposons les démarches qui nous ont permis de concevoir un algorithme de résolution ainsi que les difficultés rencontrées durant son élaboration.
 
-Notre réflexion portée sur le concept du jeu et sa méthode de résolution nous ont motivés pour sélectionner ce projet parmi les autres.%expliciter
-
-%Voir première ligne pour java
-%Le langage de programmation utilisé doit être en Java.
-%Notons également une contrainte imposée pour le développement à savoir de développer en utilisant le langage de programmation Java.
+Notre réflexion portée sur le concept du jeu et sa méthode de résolution nous ont motivés pour sélectionner ce projet parmi les autres.
 
 	\subsection{Le jeu de Ricochet Robot}
 	%expliciter les règles/but du jeu
@@ -401,13 +397,27 @@ Voici l'architecture de notre projet :
 
 \section{Expérimentations}
 	\subsection{Comparaison du temps de calcul}
+	
+	
+Dans le cas de notre jeu la complexité a été très variable, ce qui est la cause du nombre d'information a traiter et aussi aux algorithmes de recherche.En effet  la complexité est un domaine de l'informatique qui étudie la quantité de ressources (temps, espace mémoire, etc.) dont a besoin un algorithme pour résoudre un problème algorithmique.Ici nous comparons a travers une courbe le temps que met les deux algorithmes a trouver la solution du jeu en fonction du nombre de mouvement a effectuer.	
+	\begin{figure}[h]
+	\begin{center}
+	\includegraphics[scale=0.37]{./images/time.png}
+	\caption{Courbes du temps d’exécution des algorithmes  en fonction du  nombre de mouvements pour les Algorithmes A* et BFS}
+	\end{center}
+\end{figure}
+\newline
+Au vu de cela nous pouvons noter que cette différence de temps d’exécution entre les deux algorithmes est en parti dû  à la différence du  nombres de nœuds explorés, et aux différences fondamentales des deux algorithmes.
+
+	
 	\subsection{Nombre de nœuds explorés}
-On a ici la courbe représentant le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme \textsl{BFS}. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme \textsl{BFS}. Le tableau suivant représente le nombre de nœuds moyens parcourus en fonction du nombre de mouvements des résolutions.
+On a ici la courbe représentant le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme \textsl{BFS}. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme \textsl{BFS}. Le tableau suivant représente le nombre de nœuds moyens parcourus en fonction du nombre de mouvements des résolutions.En ce qui concerne l'algorithme A* on observe un très faible nombre de nœuds explorés par rapport aux nœuds explorés lors de l’exécution de l'algorithme \textsl{BFS} , ce qui est en effet dû a la différence de paramètres pris en compte , et donc à la différence qu'oppose ces deux algorithmes dans la recherche de la solution au jeu. 
 
 \begin{figure}[h]
 	\begin{center}
-	\includegraphics[scale=0.36]{./images/nodeBFS.png}
-	\caption{Courbes du nombre de nœuds en fonction du  nombre de mouvements}
+	\includegraphics[scale=0.37]{./images/node.png}
+	\caption{Courbes du nombre de nœuds en fonction du  nombre de mouvements pour les Algorithmes A* et BFS
+	 }
 	\end{center}
 	\begin{center}
 	\includegraphics[scale=0.14]{./images/tabBFS.png}
@@ -427,9 +437,9 @@ Ce projet à été très formateur pour l'ensemble du groupe, nous avons pu déc
 \end{itemize}
 
 \begin{thebibliography}{9}
-\bibitem{ref1} Hugo Larochelle, chercheur en apprentissage automatique et chercheur chze Google Brain. \url{http://info.usherbrooke.ca/hlarochelle/cours/ift615_E2013/contenu.html}
+\bibitem{ref1} Hugo Larochelle, chercheur en apprentissage automatique et chercheur chez Google Brain. \url{http://info.usherbrooke.ca/hlarochelle/cours/ift615_E2013/contenu.html}
 \bibitem{ref2} Course:CPSC:Artificial Intelligence/States and Searching, The University of British Columbia \url{https://wiki.ubc.ca/Course:CPSC:Artificial_Intelligence/States_and_Searching}
-\bibitem{ref3} A Case Studu for Human Complex Problem Solving, 15 Septembre 2005
+\bibitem{ref3} A Case Study for Human Complex Problem Solving, 15 Septembre 2005
 \bibitem{ref4} MoutainWest RubyConf 2015 - Solving Ricochet Robots \url{https://www.youtube.com/watch?v=fvuK0Us4xC4}
 \bibitem{ref5} Wikipedia, Algorithme A* \url{https://fr.wikipedia.org/wiki/Algorithme_A*}
 \bibitem{ref6} Wikipedia, Algorithme de parcours en largeur \url{https://fr.wikipedia.org/wiki/Algorithme_de_parcours_en_largeur}
