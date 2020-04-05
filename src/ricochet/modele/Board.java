@@ -45,12 +45,9 @@ public class Board extends AbstractModeleEcoutable {
 
 	/** Nom du fichier contenant la description du plateau de jeu */
 	private String filename;
-	public static int HAUTEUR = 16;
-	public static int LARGEUR = 16;
-	public static int MILIEU_BAS = (HAUTEUR / 2) - 1;
-	public static int MILIEU_HAUT = HAUTEUR / 2;
-	protected Random rand;
 
+	/** Génrateur de nombre aléatoires */
+	protected Random rand;
 
 	/**
 	 * Création du plateau de jeu par rapport à un nom de fichier donné. Il y a 256
@@ -336,6 +333,13 @@ public class Board extends AbstractModeleEcoutable {
 		return false;
 	}
 
+	public boolean hasWall(int x, int y) {
+		for (Direction dir : Direction.values())
+			if (cases[x][y].isWall(dir))
+				return true;
+		return false;
+	}
+
 	/**
 	 * Renvoi la position d'arrivée à partir d'une position de départ et dans une
 	 * direction donnée.
@@ -418,28 +422,13 @@ public class Board extends AbstractModeleEcoutable {
 		}
 		return false;
 	}
-	
-	
-	/**
-	 * Détermine si un robot r a effectué un mouvement dans une direction dir donné
-	 * @param r : Robot qui va effectuer le déplacement
-	 * @param dir : direction dans laquelle le robot va se déplacer
-	 * @return true si le robot s'est déplacé et false sinon
-	 */
-	public boolean moved(Robot r, Direction dir) {
-		if (canMoveInDir(r.getPositionRobot(), dir)) {
-			moveRobot(r, dir);
-			return true;
-		}
-		return false;
-	}
 
 	/**
 	 * Retourne la liste complète des positions d'arrivées possible pour un robot
 	 * donné à sa position actuelle sur le plateau de jeu. Les mouvements possibles
 	 * d'un robot sont des déplacements d'au moins une case dans une des quatres
-	 * directions cardinales. Les positions renvoyées sont les positions d'arrivées du
-	 * déplacement.
+	 * directions cardinales. Les positions renvoyées sont les positions d'arrivées
+	 * du déplacement.
 	 * 
 	 * @param r Robot étudié pour trouver tous ses mouvements possibles à partir de
 	 *          sa position dans le plateau de jeu.
@@ -456,10 +445,10 @@ public class Board extends AbstractModeleEcoutable {
 	}
 
 	/**
-	 * Retourne la liste complète des positions d'arrivées possible pour une position
-	 * donnée. Les mouvements possibles sont des déplacements d'au moins une case
-	 * dans une des quatres directions cardinales. Les positions renvoyées sont les
-	 * positions d'arrivées du déplacement.
+	 * Retourne la liste complète des positions d'arrivées possible pour une
+	 * position donnée. Les mouvements possibles sont des déplacements d'au moins
+	 * une case dans une des quatres directions cardinales. Les positions renvoyées
+	 * sont les positions d'arrivées du déplacement.
 	 * 
 	 * @param position Position étudiée pour trouver tous les mouvements possibles à
 	 *                 partir de cette position dans le plateau de jeu.
@@ -666,13 +655,13 @@ public class Board extends AbstractModeleEcoutable {
 			}
 		}
 		try {
-			File file = new File(filename);
+			File file = new File("dist/" + filename);
 			if (file.createNewFile()) {
 				System.out.println("File created: " + file.getName());
 			} else {
 				System.out.println("File already exists.");
 			}
-			FileWriter fileWriter = new FileWriter(filename);
+			FileWriter fileWriter = new FileWriter("dist/" + filename);
 			fileWriter.write(str);
 			fileWriter.close();
 			System.out.println("Successfully wrote to the file.");
@@ -749,209 +738,180 @@ public class Board extends AbstractModeleEcoutable {
 			file.close();
 		} catch (IOException e) {
 			System.err.println("Erreur lors de la lecture du fichier " + filename);
+			System.exit(1);
 		}
 		takeRobot();
 		takeGoal();
 		notifyListener();
 	}
-	
-	public void addFile(String filename){
-		/*try {
-			File myFile = new File("./"+filename);
-			if (myFile.createNewFile()){
-				System.out.println("Fichier créé");
-			} 
-			else{
-				System.out.println("Fichier pas créé");
-			}
-		}
-		catch (IOException e){
-				System.out.println("Error");
-		}*/
-		robots.clear();//enlève les robots
-		goals.clear();//enlève les objectifs
-		cleanWalls();//enlève tous les murs
-        this.setMursExternes();//rajoute les murs externes
-        this.setAnglesObjectifs();//rajoute les angles
-        printBoard();//rajoute les objectifs et les robots
-        			//on enregistre tout
-        			//on notifie le changement
-        //this.finirMurs();
-        //this.ajoutRobots();
-        //loadBoard();
-      //notifyListener();
-	}
-	
-	public void cleanWalls(){
-		for (int i=0;i < HAUTEUR; i++){
-			for (int j = 0; j < LARGEUR; j++){
-				this.cases[i][j].setAllWalls(false);
-			}
-		}
-	}
-    private void setMursExternes() {
-        /*
-         * Le placement d'un mur verrouille les cellules voisines pour éviter qu'un
-         * autre puisse se coller.
-         */
-        // Placement des murs sur les 4 bords externes
-        for (int i = 0; i < HAUTEUR; i++) {
-        	this.cases[i][0].setWall(Direction.W);
-            this.cases[i][LARGEUR - 1].setWall(Direction.E);
-        }
-        for (int j = 0; j < LARGEUR; j++) {
-                this.cases[0][j].setWall(Direction.N);
-                this.cases[HAUTEUR - 1][j].setWall(Direction.S);
-        }
-        this.cases[MILIEU_HAUT][MILIEU_BAS].setBlackCase();
-        this.cases[MILIEU_HAUT][MILIEU_HAUT].setBlackCase();
-        this.cases[MILIEU_BAS][MILIEU_HAUT].setBlackCase();
-        this.cases[MILIEU_BAS][MILIEU_BAS].setBlackCase();
-        // On verrouille les cellules centrales qui ne pourront pas avoir d'angles
-        for (int i = 6; i < 10; i++) {
-                for (int j = 6; j < 10; j++) {
-                        this.cases[i][j].setVerrou(true);
-                }
-        }
-        /*
-         * Placement des murs simples, 1 par quart de plateau collé aux cotés externes
-         * et perpendiculaire. Les cases voisines des murs simples sont verrouillés sur
-         * un seul axe.
-         */
-        int m = 0, n = 0, r = 0;
-        for (int i = 0; i < 2; i++) {
-                r = rand.nextInt(6) + 2;
-                this.cases[m][r].setWall(Direction.W);
-                this.cases[m][r - 1].setWall(Direction.E);
-                if (m == 0) {
-                        this.cases[m + 1][r - 1].setVerrou(true);
-                        this.cases[m + 1][r].setVerrou(true);
-                } else {
-                        this.cases[m - 1][r - 1].setVerrou(true);
-                        this.cases[m - 1][r].setVerrou(true);
-                }
-                r = rand.nextInt(6);
-                this.cases[m][r + 8].setWall(Direction.W);
-                this.cases[m][r + 7].setWall(Direction.E);
-                if (m == 0) {
-                        this.cases[m + 1][r + 8].setVerrou(true);
-                        this.cases[m + 1][r + 7].setVerrou(true);
-                } else {
-                        this.cases[m - 1][r + 8].setVerrou(true);
-                        this.cases[m - 1][r + 7].setVerrou(true);
-                }
-                m = HAUTEUR - 1;
-        }
-        for (int j = 0; j < 2; j++) {
-                r = rand.nextInt(6) + 2;
-                this.cases[r][n].setWall(Direction.N);
-                this.cases[r - 1][n].setWall(Direction.S);
-                if (n == 0) {
-                        this.cases[r][n + 1].setVerrou(true);
-                        this.cases[r - 1][n + 1].setVerrou(true);
-                } else {
-                        this.cases[r][n - 1].setVerrou(true);
-                        this.cases[r - 1][n - 1].setVerrou(true);
-                }
-                r = rand.nextInt(6);
-                this.cases[r + 8][n].setWall(Direction.N);
-                this.cases[r + 7][n].setWall(Direction.S);
-                if (n == 0) {
-                        this.cases[r + 8][n + 1].setVerrou(true);
-                        this.cases[r + 7][n + 1].setVerrou(true);
-                } else {
-                        this.cases[r + 8][n - 1].setVerrou(true);
-                        this.cases[r + 7][n - 1].setVerrou(true);
-                }
-                n = LARGEUR - 1;
-        }
-        
-    }
-    
-    private void setAnglesObjectifs() {
-        boolean anglesup = false;
-        // Coordonnées tirées au hasard
-        int x = 0, y = 0;
-        // Coordonées de la cellule en cours
-        int m = 0, n = 0;
-        // On parcours chaque quart de terrain
-        for (int i = 0; i < 4; i++) {
-                switch (i) {
-                case 1:
-                        n = 8;
-                        break;
-                case 2:
-                        m = 8;
-                        break;
-                case 3:
-                        n = 0;
-                        break;
-                }
-                // On met en place les 4 angles sur des positions autorisées puis on verrouilles
-                // les cellules voisines.
-                for (int j = 0; j < 4; j++) {
-                        // Permet de faire un 17eme angle sur le premier quart de terrain
-                        if (!anglesup) {
-                                j--;
-                                anglesup = true;
-                        }
-                        x = rand.nextInt(8);
-                        y = rand.nextInt(8);
-                        while (this.cases[x + m][y + n].isMur() || this.cases[x + m][y + n].isVerrou()) {
-                                x = rand.nextInt(8);
-                                y = rand.nextInt(8);
-                        }
-                        // Choix de la direction de l'angle aléatoire
-                        this.cases[x + m][y + n].faireAngle(rand.nextInt(4));
-                        
-                        
-                        /*
-                         * A optimiser dans une boucle, mise en place d'un verrou tout autour des angles
-                         * pour éviter qu'ils sont collés à d'autres.
-                         */
-                /*
-                        this.cases[x + m - 1][y + n - 1].setVerrou(true);
-                        this.cases[x + m][y + n - 1].setVerrou(true);
-                        this.cases[x + m + 1][y + n - 1].setVerrou(true);
-                        this.cases[x + m - 1][y + n].setVerrou(true);
-                        this.cases[x + m + 1][y + n].setVerrou(true);
-                        this.cases[x + m - 1][y + n + 1].setVerrou(true);
-                        this.cases[x + m][y + n + 1].setVerrou(true);
-                        this.cases[x + m + 1][y + n + 1].setVerrou(true);
-                        // Création de la cible, elle est placée dans l'angle et ajoutée à l'attribut
-                        // cibles avec sa position.
-                     //Goal cible = new Goal();
-                        // On ne place pas directement les cibles sur le plateau mais on sauvegarde leur
-                        // position dans un hashmap cibles.
-                     //this.cibles.put(cible, new Position((x + m), (y + n)));
-                }*/
-        }
-        	}
-    }
 
-    /**
-     * Parcours du tableau pour mettre tous les murs manquants. Si un mur est sur
-     * une case au nord, un mur doit être présent au sud dans la case du dessus.
-     */
-    private void finirMurs() {
-            for (int i = 1; i < 15; i++) {
-                    for (int j = 1; j < 15; j++) {
-                            if (this.cases[i][j].isMur(Direction.N)) {
-                                    this.cases[i - 1][j].setWall(Direction.S);
-                            }
-                            if (this.cases[i][j].isMur(Direction.E)) {
-                                    this.cases[i][j + 1].setWall(Direction.W);
-                                    ;
-                            }
-                            if (this.cases[i][j].isMur(Direction.S)) {
-                                    this.cases[i + 1][j].setWall(Direction.N);
-                                    ;
-                            }
-                            if (this.cases[i][j].isMur(Direction.W)) {
-                                    this.cases[i][j - 1].setWall(Direction.E);
-                                    ;
-                            }
-                    }
-            }
-    }
+	/**
+	 * Génération d'un plateau aléatoire qui suit les règles de placement du plateau
+	 * de jeu officiel. 4 robots, 17 cibles dans 17 angles. 4 cases internes et murs
+	 * extérieurs.
+	 */
+	public void generateBoard() {
+		robots.clear();
+		goals.clear();
+		Robot.ID = 0;
+		Goal.ID = 0;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				cases[i][j] = new Case();
+			}
+		}
+
+		for (int i = 0; i < height; i++) {
+			addWall(i, 0, Direction.W);
+			addWall(i, 15, Direction.E);
+		}
+		for (int j = 0; j < height; j++) {
+			addWall(0, j, Direction.N);
+			addWall(15, j, Direction.S);
+		}
+
+		for (int i = 7; i < 9; i++) {
+			for (int j = 7; j < 9; j++) {
+				addWall(i, j, Direction.N);
+				addWall(i, j, Direction.S);
+				addWall(i, j, Direction.E);
+				addWall(i, j, Direction.W);
+			}
+		}
+
+		for (int i = 6; i < 10; i++) {
+			for (int j = 6; j < 10; j++) {
+				cases[i][j].lockCase();
+				;
+			}
+		}
+		generateWalls();
+		generateAngles();
+		addRobots();
+		takeRobot();
+		takeGoal();
+		notifyListener();
+	}
+
+	private void addRobots() {
+		for (int i = 0; i < 4; i++) {
+			Position p = new Position((short) rand.nextInt(height), (short) rand.nextInt(width));
+			while (isRobot(p) || ((p.getX() == 7 || p.getX() == 8) && (p.getY() == 7 || p.getY() == 8))) {
+				p = new Position((short) rand.nextInt(height), (short) rand.nextInt(width));
+			}
+			Robot r = new Robot(p);
+			robots.add(r);
+		}
+	}
+
+	/**
+	 * Placement des murs simples, 1 par quart de plateau collé aux cotés externes
+	 * et perpendiculaire au mur présejt. Les cases voisines des murs simples sont
+	 * verrouillées.
+	 */
+	private void generateWalls() {
+		int m = 0, n = 0, r = 0;
+		for (int i = 0; i < 2; i++) {
+			r = rand.nextInt(6) + 2;
+			addWall(m, r, Direction.W);
+			if (m == 0) {
+				cases[m + 1][r - 1].lockCase();
+				cases[m + 1][r].lockCase();
+			} else {
+				cases[m - 1][r - 1].lockCase();
+				cases[m - 1][r].lockCase();
+			}
+			r = rand.nextInt(6);
+			addWall(m, r + 8, Direction.W);
+			if (m == 0) {
+				cases[m + 1][r + 8].lockCase();
+				cases[m + 1][r + 7].lockCase();
+			} else {
+				cases[m - 1][r + 8].lockCase();
+				cases[m - 1][r + 7].lockCase();
+			}
+			m = height - 1;
+		}
+
+		for (int j = 0; j < 2; j++) {
+			r = rand.nextInt(6) + 2;
+			addWall(r, n, Direction.N);
+			if (n == 0) {
+				cases[r][n + 1].lockCase();
+				cases[r - 1][n + 1].lockCase();
+			} else {
+				cases[r][n - 1].lockCase();
+				cases[r - 1][n - 1].lockCase();
+			}
+			r = rand.nextInt(6);
+			addWall(r + 8, n, Direction.N);
+			if (n == 0) {
+				cases[r + 8][n + 1].lockCase();
+				cases[r + 7][n + 1].lockCase();
+			} else {
+				cases[r + 8][n - 1].lockCase();
+				cases[r + 7][n - 1].lockCase();
+			}
+			n = width - 1;
+		}
+
+	}
+
+	private void generateAngles() {
+		boolean anglesup = false;
+		int x = 0, y = 0;
+		int m = 0, n = 0;
+		for (int i = 0; i < 4; i++) {
+			n = i == 1 ? 8 : n;
+			m = i == 2 ? 8 : m;
+			n = i == 3 ? 0 : n;
+			for (int j = 0; j < 4; j++) {
+				if (!anglesup) {
+					j--;
+					anglesup = true;
+				}
+				x = rand.nextInt(8);
+				y = rand.nextInt(8);
+				while (hasWall(x + m, y + n) || cases[x + m][y + n].isLocked()) {
+					x = rand.nextInt(8);
+					y = rand.nextInt(8);
+				}
+				addAngle(x + m, y + n);
+
+				cases[x + m - 1][y + n - 1].lockCase();
+				cases[x + m][y + n - 1].lockCase();
+				cases[x + m + 1][y + n - 1].lockCase();
+				cases[x + m - 1][y + n].lockCase();
+				cases[x + m + 1][y + n].lockCase();
+				cases[x + m - 1][y + n + 1].lockCase();
+				cases[x + m][y + n + 1].lockCase();
+				cases[x + m + 1][y + n + 1].lockCase();
+
+				Goal cible = new Goal(new Position((short) (x + m), (short) (y + n)));
+				goals.add(cible);
+			}
+		}
+	}
+
+	private void addAngle(int i, int j) {
+		Direction dir = Direction.getRandomDirection();
+		switch (dir) {
+		case N:
+			addWall(i, j, Direction.N);
+			addWall(i, j, Direction.W);
+			break;
+		case S:
+			addWall(i, j, Direction.S);
+			addWall(i, j, Direction.E);
+			break;
+		case E:
+			addWall(i, j, Direction.E);
+			addWall(i, j, Direction.N);
+			break;
+		case W:
+			addWall(i, j, Direction.S);
+			addWall(i, j, Direction.W);
+			break;
+		}
+	}
 }

@@ -14,8 +14,8 @@ import java.util.LinkedList;
  * rendre sur la cible. La première solution trouvée est forcément le chemin le
  * plus court. La recherche s'effectue à partir du root (état initial) puis tous
  * ses "children" sont testés. Si aucun ne termine le jeu, les enfants de chaque
- * "children" sont générés puis testés. Le temps de résolution est proportionnel à
- * la complexité de la solution (le nombre de mouvements requis).
+ * "children" sont générés puis testés. Le temps de résolution est proportionnel
+ * à la complexité de la solution (le nombre de mouvements requis).
  */
 public class BFSSearch implements Runnable {
 
@@ -28,7 +28,7 @@ public class BFSSearch implements Runnable {
 	private HashMap<Robot, Position> originalPosition = new HashMap<Robot, Position>();
 
 	/** Profondeur maximale de recherche */
-	public byte profondeur = 5;
+	public byte profondeur = 6;
 
 	/**
 	 * Constructeur de la recherche suivant un plateau initial.
@@ -37,6 +37,7 @@ public class BFSSearch implements Runnable {
 	 */
 	public BFSSearch(Board b) {
 		this.board = b;
+		compteurNode = 0;
 		for (Robot r : board.getRobots()) {
 			originalPosition.put(r, new Position(r.getPositionRobot()));
 		}
@@ -76,8 +77,14 @@ public class BFSSearch implements Runnable {
 			}
 			ArrayList<State> childs = new ArrayList<State>();
 			for (State s : nodes) {
-				childs.addAll(s.childs());
+				try {
+					childs.addAll(s.childs());
+				} catch(java.lang.OutOfMemoryError e) {
+					System.err.println("Error : not enought memory");
+					return new LinkedList<Move>();
+				}
 			}
+			System.out.println("Deep : " + (profondeur - prof) + "\t\tChilds :" + childs.size());
 			for (State sprime : childs) {
 				compteurNode++;
 				if (sprime.isFinished()) {
@@ -206,6 +213,9 @@ public class BFSSearch implements Runnable {
 			ArrayList<State> childs = new ArrayList<State>();
 			for (Robot r : board.getRobots()) {
 				for (Direction d : Direction.values()) {
+					if (ancestor != null && ancestor.currentMove != null && ancestor.robotMoved == r
+							&& ancestor.currentMove == Direction.opposite(d))
+						continue;
 					if (board.canMoveInDir(r.getPositionRobot(), d)) {
 						State s = new State(d, r, this);
 						childs.add(s);

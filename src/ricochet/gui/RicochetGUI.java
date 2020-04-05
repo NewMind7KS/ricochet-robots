@@ -30,7 +30,7 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	 * Constructeur de l'interface graphique
 	 */
 	public RicochetGUI() {
-		this.board = new Board("dist/testBoard.txt");
+		this.board = new Board("dist/plateau.txt");
 		this.board.takeGoal();
 		this.board.takeRobot();
 		this.setTitle("Ricochet Robot");
@@ -47,6 +47,24 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	}
 	
 	
+	public RicochetGUI(String string) {
+		this.board = new Board(string);
+		this.board.takeGoal();
+		this.board.takeRobot();
+		this.setTitle("Ricochet Robot");
+		this.setSize(800, 800);
+		this.setLocationRelativeTo(null);
+		this.addWindowListener(this);
+		this.setResizable(false);
+		this.setVisible(true);
+		this.setContentPane(contentPane);
+		contentPane.add(new VueBoard(board));
+		contentPane.add(new VueMenu(board));
+		this.addKeyListener(this);
+		this.pack();
+	}
+
+
 	public static int getCompteur() {
 		return compteur;
 	}
@@ -90,27 +108,26 @@ public class RicochetGUI extends JFrame implements WindowListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent key) {
 		if (key.getKeyCode() == KeyEvent.VK_LEFT) {
-			//board.moveRobot(board.getMainRobot(), Direction.W);
-			if (board.moved(board.getMainRobot(), Direction.W)) {
+			if (board.canMoveInDir(board.getMainRobot().getPositionRobot(), Direction.W)) {
+				board.moveRobot(board.getMainRobot(), Direction.W);
 				RicochetGUI.compteur++;
 			}
 		} else if (key.getKeyCode() == KeyEvent.VK_UP) {
-			//board.moveRobot(board.getMainRobot(), Direction.N);
-			if (board.moved(board.getMainRobot(), Direction.N)) {
+			if (board.canMoveInDir(board.getMainRobot().getPositionRobot(), Direction.N)) {
+				board.moveRobot(board.getMainRobot(), Direction.N);
 				RicochetGUI.compteur++;
 			}
 		} else if (key.getKeyCode() == KeyEvent.VK_RIGHT) {
-			//board.moveRobot(board.getMainRobot(), Direction.E);
-			if (board.moved(board.getMainRobot(), Direction.E)) {
+			if (board.canMoveInDir(board.getMainRobot().getPositionRobot(), Direction.E)) {
+				board.moveRobot(board.getMainRobot(), Direction.E);
 				RicochetGUI.compteur++;
 			}
 		} else if (key.getKeyCode() == KeyEvent.VK_DOWN) {
-			//board.moveRobot(board.getMainRobot(), Direction.S);
-			if (board.moved(board.getMainRobot(), Direction.S)) {
+			if (board.canMoveInDir(board.getMainRobot().getPositionRobot(), Direction.S)) {
+				board.moveRobot(board.getMainRobot(), Direction.S);
 				RicochetGUI.compteur++;
 			}
 		}
-		System.out.println("Nbre coups : " + RicochetGUI.compteur);
 		if (board.isFinished())
 			JOptionPane.showMessageDialog(this, "Jeu Terminé en " + getCompteur() + " coups");
 	}

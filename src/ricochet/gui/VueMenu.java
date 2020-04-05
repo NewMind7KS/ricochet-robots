@@ -54,13 +54,16 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		writeBoard = new JButton("Enregistrer plateau");
 		writeBoard.addActionListener(new ActionButton());
 		add(writeBoard);
+		newRandomFile = new JButton("Créer un plateau aléatoire");
+		newRandomFile.addActionListener(new ActionButton());
+		add(newRandomFile);
 		BFSSearch = new JButton("BFSSearch");
 		BFSSearch.addActionListener(new ActionButton());
 		add(BFSSearch);
 		astar = new JButton("A* Solver");
 		astar.addActionListener(new ActionButton());
 		add(astar);
-		reset = new JButton("Reset Board");
+		reset = new JButton("Charger plateau");
 		reset.addActionListener(new ActionButton());
 		add(reset);
 		liste = new JComboBox<Object>(board.getRobots().toArray());
@@ -76,18 +79,12 @@ public class VueMenu extends JPanel implements EcouteurModele {
 		reset.setFocusable(false);
 		liste.setFocusable(false);
 		liste2.setFocusable(false);
-		
+		newRandomFile.setFocusable(false);
 		compteur = new JLabel("Nombre de coups : " + RicochetGUI.getCompteur());
 		compteur.setFont(new Font("Courrier New", Font.BOLD + Font.ITALIC, 12));
 		compteur.setForeground(Color.BLACK);
 		compteur.setHorizontalAlignment(JLabel.CENTER);
 		add(compteur);
-		
-		
-		newRandomFile = new JButton("Créer un plateau aléatoire");
-		newRandomFile.addActionListener(new ActionButton());
-		add(newRandomFile);
-		newRandomFile.setFocusable(false);
 	}
 
 	/**
@@ -96,7 +93,6 @@ public class VueMenu extends JPanel implements EcouteurModele {
 	 */
 	@Override
 	public void modeleMisAJour(ModeleEcoutable source) {
-//		text.setText("Robot : " + board.getMainRobot() + ", Goal : " + board.getMainGoal());
 		liste.repaint();
 		liste2.repaint();
 		compteur.setText("Nombre de coups : " + (RicochetGUI.getCompteur()+1));
@@ -112,10 +108,9 @@ public class VueMenu extends JPanel implements EcouteurModele {
 			if (ae.getSource() == printBoard)
 				board.printBoard();
 			else if (ae.getSource() == writeBoard)
-				board.writeBoard("Board.txt");
+				board.writeBoard("board.txt");
 			else if (ae.getSource() == BFSSearch) {
 				BFSSearch search = new BFSSearch(board);
-				search.profondeur = 5;
 				Thread th = new Thread(search);
 				th.start();
 			}
@@ -133,7 +128,7 @@ public class VueMenu extends JPanel implements EcouteurModele {
 				th.start();
 			}
 			else if (ae.getSource() == newRandomFile) {
-				board.addFile("hello.txt");
+				board.generateBoard();
 			}
 		}
 	}

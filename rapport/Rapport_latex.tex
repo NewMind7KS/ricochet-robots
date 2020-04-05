@@ -214,10 +214,10 @@ Si un état final est rencontré, remonter le chemin jusqu'à la racine $root$.
 
 Cette méthode de résolution garantie un résultat rapidement, mais au détriment de la mémoire. De plus, la première solution est garantie d'être la solution optimum.
 
-Le nombre d'état est exponentiel, ce que pose des problèmes de mémoire et empêche la résolution de long chemins. À l'état initial, il y a 4 robots qui peuvent se déplacer dans 4 directions, cela apporte 16 possibilités. Puis en profondeur 2, pour chacun des 16 cas, il y a 2 à 3 mouvements possibles pour chaque robot. L'optimisation de cet algorithme peut résider d'éviter les mouvements inverses mais aussi de déplacer en premier le robot principal.
+Le nombre d'état est exponentiel, ce que pose des problèmes de mémoire et empêche la résolution de long chemins. À l'état initial, il y a 4 robots qui peuvent se déplacer dans 4 directions, cela apporte 16 possibilités. Puis en profondeur 2, pour chacun des 16 cas, il y a 2 à 3 mouvements possibles pour chaque robot. L'algorithme est optimisé pour éviter les mouvements inverses. Certaines études montrent également qui pour de longs chemin, le fait de jouer en premier le robot principal donne plus de chance de trouver le chemin rapidement.
 
 		\subsubsection{Implémentation}
-Ricochet Robot est un problème complexe à résoudre, le nombre de cas augmente très rapidement dès la profondeur 6. Nous avons choisi de choisir ce algorithme car il permet de résoudre plus de situations de jeu. Mais les performances de notre modèle nous empêchent de trouver des chemins de plus de 5 mouvements en raison de manque de mémoire et d'optimisation. Chaque état est stocké suivant la classe interne \texttt{State} contenue dans la classe \texttt{BFSSearch}, figure \ref{bfs}.
+Ricochet Robot est un problème complexe à résoudre, le nombre de cas augmente très rapidement dès la profondeur 6. Nous avons choisi de choisir ce algorithme car il permet de résoudre plus de situations de jeu. Mais les performances de notre modèle nous empêchent de trouver des chemins de plus de 6 mouvements en raison de manque de mémoire et d'optimisations. Chaque état est stocké suivant la classe interne \texttt{State} contenue dans la classe \texttt{BFSSearch}, figure \ref{bfs}.
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -226,11 +226,11 @@ Ricochet Robot est un problème complexe à résoudre, le nombre de cas augmente
 	\end{center}
 \end{figure}
 
-Ainsi, la mémoire utilisée pour stocker un état de jeu est assez faible, un lien avec tous les ancêtres depuis l'état courant permet de tracer le chemin parcouru par tous les robots depuis le plateau de base contenu dans la classe \texttt{BFSSearch}. Par exemple, pour savoir si l'état est considéré comme terminé, il faut reconstituer le chemin depuis l'origine, puis jouer chaque coup depuis le plateau de base. Ensuite vérifier si le robot est sur la cible, enfin reconstituer le plateau de base en réinitialisant les positions des robots depuis \texttt{originalPosition}.
+Ainsi, la mémoire utilisée pour stocker un état de jeu est assez faible, un lien avec tous les ancêtres depuis l'état courant permet de tracer le chemin parcouru par tous les robots depuis le plateau de base contenu dans la classe \texttt{BFSSearch}. Pour savoir si l'état est considéré comme terminé, il faut reconstituer le chemin depuis l'origine, puis jouer chaque coup depuis le plateau de base. Ensuite vérifier si le robot est sur la cible, enfin reconstituer le plateau de base en réinitialisant les positions des robots depuis \texttt{originalPosition}.
 
 Pour gagner du temps lors de l’exécution il serait possible de déterminer les positions d'arrivée à chaque état et de placer directement le robot à cet endroit à la place de réaliser les multiples tests de déplacement.
 
-Le temps nécessaire pour trouver un chemin est assez court pour des résolutions en 5 mouvements, mais au delà il faut une puissance de calcul supplémentaire et de la mémoire. En effet, chaque état est stocké en mémoire, une optimisation viserait à supprimer ces états et les retrouver en chemin inverse.
+Le temps nécessaire pour trouver un chemin est assez court pour des résolutions en 6 mouvements, mais au delà il faut une puissance de calcul supplémentaire et de la mémoire. En effet, chaque état de chaque profondeur est stocké en mémoire, une optimisation viserait à supprimer ces états et les retrouver en chemin inverse.
 
 		\subsubsection{Détails}
 Le pseudo-code de l'algorithme BFS est l'algorithme \ref{algobfs}.
@@ -276,7 +276,7 @@ Pour ouvrir sur d'autres possibilités, l'algorithme DFS (Deep First Searching) 
 
 \begin{figure}[htpb]
 	\begin{center}
-	\includegraphics[scale=0.3]{./images/interface.png}
+	\includegraphics[scale=0.4]{./images/interface.png}
 	\caption{Interface de jeu}\label{interface}
 	\end{center}
 \end{figure}
@@ -292,7 +292,7 @@ La génération aléatoire de plateau créé un fichier qui pourra être chargé
 \item Placement aléatoire de 4 robots, jamais dans la même case.
 \end{itemize}
 
-Il est également possible d'enregistrer le plateau courant depuis l'interface graphique pour reprendre une configuration.
+Il est également possible d'enregistrer le plateau courant depuis l'interface graphique pour reprendre une configuration et de le recharger par la suite.
 
 		\subsubsection{Format du fichier de configuration}\label{structFichier}
 Le fichier contenant les données de configuration d'un plateau de jeu est composé de la manière suivante :
@@ -402,7 +402,7 @@ Voici l'architecture de notre projet :
 \section{Expérimentations}
 	\subsection{Comparaison du temps de calcul}
 	\subsection{Nombre de nœuds explorés}
-On a ici la courbe représentant le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme BFS. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme BFS.On a par la suite un tableau représentant le nombre de nœuds moyens en fonction du nombre de mouvement a faire pour la résolution du jeu.  
+On a ici la courbe représentant le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme \textsl{BFS}. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme \textsl{BFS}. Le tableau suivant représente le nombre de nœuds moyens parcourus en fonction du nombre de mouvements des résolutions.
 
 \begin{figure}[h]
 	\begin{center}
@@ -431,6 +431,8 @@ Ce projet à été très formateur pour l'ensemble du groupe, nous avons pu déc
 \bibitem{ref2} Course:CPSC:Artificial Intelligence/States and Searching, The University of British Columbia \url{https://wiki.ubc.ca/Course:CPSC:Artificial_Intelligence/States_and_Searching}
 \bibitem{ref3} A Case Studu for Human Complex Problem Solving, 15 Septembre 2005
 \bibitem{ref4} MoutainWest RubyConf 2015 - Solving Ricochet Robots \url{https://www.youtube.com/watch?v=fvuK0Us4xC4}
+\bibitem{ref5} Wikipedia, Algorithme A* \url{https://fr.wikipedia.org/wiki/Algorithme_A*}
+\bibitem{ref6} Wikipedia, Algorithme de parcours en largeur \url{https://fr.wikipedia.org/wiki/Algorithme_de_parcours_en_largeur}
 \end{thebibliography}
 \end{document} %fin du document
 
