@@ -1,12 +1,15 @@
 package ricochet.modele;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class Solver implements Runnable {
-
+	
+	/** Compteur de noeuds parcourus */
+	private static long compteurNode = 0;
 	/** Liste fermée */
 	private ArrayList<Node> closedList;
 	/** Liste ouverte */
@@ -21,6 +24,7 @@ public class Solver implements Runnable {
 	 * @param board
 	 */
 	public Solver(Board board) {
+		compteurNode = 0;
 		this.board = board;
 		closedList = new ArrayList<Node>();
 		openList = new ArrayList<Node>();
@@ -63,6 +67,9 @@ public class Solver implements Runnable {
 	 * @return
 	 */
 	public ArrayList<Position> astar() {
+		
+		long begin = System.nanoTime();
+		
 		closedList.clear();
 		openList.clear();
 
@@ -77,6 +84,7 @@ public class Solver implements Runnable {
 		boolean insert = false;
 		// Tant qu'un chemin est possible, on itère
 		while (!openList.isEmpty()) {
+			compteurNode++;
 			// Récupération duy noeud avec la valeur la plus basse
 			Node minNode = Collections.min(openList);
 
@@ -92,7 +100,13 @@ public class Solver implements Runnable {
 					minNode = minNode.ancestor;
 				}
 				board.moveRobotToPosition(board.getMainRobot(), startPosition);
+				System.out.println("----------- Optimal Solution ------------");
+				System.out.println("Noeuds parcourus : \t\t" + compteurNode);
 				System.out.println(chemin);
+				long end = System.nanoTime() - begin;
+				DecimalFormat df = new DecimalFormat();
+				df.setMaximumFractionDigits(3);
+				System.out.println("Temps execution : \t\t" + df.format(end / 1e9) + "s");
 				return chemin;
 			}
 			// Si ce n'est pas l'arrivée, on ajoute tous les enfants noeuds dans openList si
@@ -133,6 +147,12 @@ public class Solver implements Runnable {
 			closedList.add(minNode);
 		}
 		board.moveRobotToPosition(board.getMainRobot(), startPosition);
+		System.out.println("----------- No solution founded ------------");
+		long end = System.nanoTime() - begin;
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(3);
+		System.out.println("Noeuds parcourus : \t\t" + compteurNode);
+		System.out.println("Temps execution : \t\t" + df.format(end / 1e9) + "s");
 		System.out.println("Pas de chemin trouvé avec A*");
 		return null;
 	}
