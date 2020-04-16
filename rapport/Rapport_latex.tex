@@ -13,6 +13,8 @@
 \usepackage{appendix} % Pour l'annexe
 \usepackage[linesnumbered,ruled, french,onelanguage]{algorithm2e}
 
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+
 \begin{document}
 \makeatletter
   \begin{titlepage}
@@ -45,24 +47,20 @@ Dans le cadre de l'unité d'enseignement Conception Logicielle Avancée enseign�
 Notre réflexion portée sur le concept du jeu et sa méthode de résolution nous ont motivés pour sélectionner ce projet parmi les autres.
 
 	\subsection{Le jeu de Ricochet Robot}
-	%expliciter les règles/but du jeu
+
 Le jeu de Ricochet Robot est un jeu de société qui se joue sur un plateau. Ce plateau se compose de murs, d'objectifs et de robots. Le but est de déplacer les robots jusqu'à ce que l'un d'eux, le robot principal, arrive sur la case objectif sélectionnée. Les robots ne se déplacent qu'en ligne droite et doivent s'arrêter lorsqu'ils rencontrent un autre robot ou un mur. Le but est donc d'arriver sur la case cible tout en faisant le moins de mouvements possibles.
-		%Le plateau
-		%les murs
-		%les robots
-		%les objectifs/cibles
+
 			\subsubsection{Le plateau}
-Ricochet Robot est dans sa version originale un jeu de plateau composé d'une grille de taille $16*16$. Chacune des 256 cases est représentée par une paire de coordonnées $(x,y)$. Une case peut comporter des murs à gauche, à droite, en haut et en bas faisant office d'obstacle de déplacement aux quatre entités appelées \textit{robots}. La grille est délimitée par une bordure de murs extérieurs. Les murs sont appelés suivant leur direction : murs 'nord', 'sud', 'est' et 'ouest'. Quatre cases au centre du jeu forment une zone noire et ne sont pas accessibles car elles disposent de murs dans les quatre directions cardinales.
+Le plateau est composé d'une grille de taille $16*16$. Chacune des 256 cases est représentée par une paire de coordonnées $(x,y)$. Une case peut comporter des murs à gauche, à droite, en haut et en bas faisant office d'obstacle de déplacement aux quatre entités appelées \textit{robots}. La grille est délimitée par une bordure de murs extérieurs. Les murs sont appelés par la suite suivant leur direction : 'nord', 'sud', 'est' et 'ouest'. Quatre cases au centre du jeu forment une zone noire et ne sont pas accessibles car elles disposent de murs dans les quatre directions.
 
 			\subsubsection{Les robots}
 Les robots sont des entités placées aléatoirement sur le plateau du jeu. Deux robots ne peuvent pas être présents sur la même case au même moment ni dans les cases centrales. Chaque robot peut se déplacer suivant les directions cardinales jusqu'à ce qu'il rencontre un obstacle, ce dernier peut être de deux types : un mur ou un autre robot. Par exemple, pour un robot placé sur une case, il lui est impossible de se déplacer sur la droite si la case sur laquelle il est possède un mur à l'Est ou s'il y a un robot sur la case de droite adjacente. 
 
 			\subsubsection{Les cibles}
-De multiples cibles sont également placées dans les angles formés par deux murs. Un des robots dit robot principal doit atteindre la cible principale pour terminer le jeu. Les mouvements des robots annexes peuvent servir au robot principal pour créer de nouveaux obstacles de déplacement. Le but est de se rendre sur la cible principale avec le moins de mouvements possible.
-Il y a 17 cibles sur le plateau, donc 17 tours de jeu dans le jeu original, cependant, dans notre cas, nous n'avons pas mis en place ces règles de jeu mais uniquement la méthode de résolution et la possibilité de jouer en interface graphique.%utilité de dire qu'on a pas fait un truc ?
+De multiples cibles sont placées dans les angles formés par deux murs. Un des robots dit robot principal doit atteindre la cible principale pour terminer le jeu. Les mouvements des robots annexes peuvent servir au robot principal pour créer de nouveaux obstacles de déplacement. Le but est de se rendre sur la cible principale avec le moins de mouvements possible.
+Il y a 17 cibles sur le plateau, donc 17 tours de jeu dans le jeu original, cependant, dans notre cas, nous n'avons pas mis en place ces règles de jeu mais uniquement la méthode de résolution et la possibilité de jouer en interface graphique.
 
-			\subsubsection{Les positions dans le plateau}
-Chaque position sur le jeu peut être représentée par des coordonnées sur un plan deux dimensions. Voici les positions utilisées, elles correspondent à l'indexation des objets avec la structure de tableau à double dimension. Comme nous pouvons le voir case $(0,0)$ est en haut à gauche.%et non en bas à gauche comme sur un grpahique par exemple.
+Chaque position sur le jeu peut être représentée par des coordonnées sur un plan deux dimensions. La figure \ref{coordonnesFig} montre les positions utilisées, elles correspondent à l'indexation des objets avec la structure de tableau à double dimension. L'origine du repère $(0,0)$ est en haut à gauche.
 \pagebreak
 
 \begin{figure}[htpb]
@@ -79,23 +77,23 @@ Chaque position sur le jeu peut être représentée par des coordonnées sur un 
   \foreach \k in {0,1,...,15}
   	{\node at (\k+0.5,16.8) {\k};}
   \end{tikzpicture}
-  \caption{Coordonnées sur le plateau de jeu}
+  \caption{Coordonnées sur le plateau de jeu}\label{coordonnesFig}
 \end{figure}
 
 	\subsection{Objectif du solveur}
 L'objectif de la résolution du jeu est de minimiser le nombre de déplacements nécessaires pour permettre au robot principal de se rendre sur l'objectif. Plusieurs solutions permettent d'arriver au résultat mais certaines sont plus rapides.
 
-Chaque robot déplacé compte pour un mouvement. Le fait de changer la position de robots annexes apporte de nouvelles possibilités de déplacement. Nous avons développés deux manières de résoudre ce problème, chaque méthode comporte des avantages et des inconvénients que nous détaillerons par la suite. La complexité du problème réside dans le nombre de déplacements possible à chaque état de jeu. Un nombre exponentielle de d'états s'ajoutent à chaque mouvement.
+Chaque robot déplacé compte pour un mouvement. Le fait de changer la position de robots annexes apporte de nouvelles possibilités de déplacement. Nous avons développés deux manières de résoudre ce problème, chaque méthode comporte des avantages et des inconvénients que nous détaillerons par la suite. La complexité du problème réside dans le nombre de déplacements possible à chaque état de jeu. Un nombre exponentielle d'états s'ajoutent à chaque mouvement.
 
 \section{Développement du moteur de jeu}
 La première étape pour la réalisation de ce projet était de concevoir le modèle du jeu. Pour cela, un premier package \texttt{modele} comporte l'ensemble des classes nécessaires à sa modélisation.
 
 	\subsection{Plateau du jeu}
-Pour modéliser le plateau, nous avons développé une classe \texttt{Board}. Cette dernière est constituée de 256 cases et représente l'état actuel du jeu. Les entités sont représentées par des classes \texttt{Robot} et \texttt{Goal}. Les robots et cibles ne sont pas directement placés sur le plateau mais possèdent leur propre position. Cela permet de ne pas vérifier dans chaque case la présence de telle ou telle entité.
+Pour modéliser le plateau, nous avons développé une classe \texttt{Board}. Cette dernière est constituée de 256 cases et représente l'état actuel du jeu. Les entités sont représentées par des classes \texttt{Robot} et \texttt{Goal}. Les cibles et robots ne sont pas directement placés sur le plateau mais possèdent leur propre position. Cela permet de ne pas vérifier dans chaque case la présence de telle ou telle entité.
 
 Les robots et les cibles sont stockés dans des listes avec la structure de donnée \texttt{ArrayList}. Des références au robot principal et à la cible principale permettent de les distinguer des autres.
 
-La construction du plateau de jeu est basée sur un fichier texte, ce fichier contient des coordonnées et une description des murs et des entités présentes (\ref{structFichier}). Cette construction est par défaut basée sur celle du plateau de jeu officiel. Mais il est possible de générer un plateau aléatoirement ou de choisir un autre fichier de configuration.
+La construction du plateau de jeu est basée sur un fichier texte, ce fichier contient des coordonnées et une description des murs et des entités présentes pour chaque case (voir:\ref{structFichier}). Cette construction est par défaut basée sur celle du plateau de jeu officiel. Mais il est possible de générer un plateau aléatoirement ou de choisir un autre fichier de configuration.
 
 Voici le diagramme de classe donnant les principales méthodes utilisées sur le plateau mais également la structure des robots et cibles.
 \pagebreak
@@ -116,10 +114,10 @@ Nous pouvons également remarquer que les 256 cases sont des objets \texttt{Case
 	\end{center}
 \end{figure}
 
-Les quatre murs possibles sont par défaut désactivés puis activés avec la méthode \texttt{setWall} dans la direction donnée. Une fois les murs mis en place, ils ne changent plus durant la partie.%activé, désactivé, plus clair
+Les quatre murs possibles sont par défaut désactivés puis activés avec la méthode \texttt{setWall} dans la direction donnée. Une fois les murs mis en place, ils ne changent plus durant la partie.
 
 	\subsection{Déplacements}
-Concernant les déplacements, les méthodes \texttt{moveRobot} et \texttt{getAllMoves} nécessitent des tests supplémentaires. Il faut vérifier que les déplacement sont valides et donner les positions d'arrivées quand un obstacle est rencontré. Pour cela, des méthodes ont été implémentées dans la classe \texttt{Board} dont voici le diagramme :
+Concernant les déplacements, les méthodes \texttt{moveRobot}, \texttt{moveRobotToPosition} et \texttt{getAllMoves} changent les positions des robots concernés. Elles nécessitent des tests supplémentaires : vérifier que les déplacement sont valides et donner les positions d'arrivées quand un obstacle est rencontré. Pour cela, des méthodes ont été implémentées dans la classe \texttt{Board} dont voici le diagramme :
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -132,7 +130,7 @@ Les déplacements sont ainsi possibles en donnant spécifiant un robot et une di
 
 	\subsection{Visualisation du jeu}
 Pour permettre de jouer au clavier et rendre le jeu plus visuel, une interface graphique à été développée en suivant le schéma MVC (Modèle Vue Contrôleur). Les murs sont représentés par des traits et les entités sont placées par rapport à leurs coordonnées respectives. Le robot en cours de déplacement est coloré en rouge et la cible principale en vert. Cette visualisation permet de mieux voir les données comparativement à une lecture sous forme textuelle.
-La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board}.
+La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board} (jeu).
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -141,16 +139,16 @@ La figure \ref{visuBoard} donne un aperçu de la vue sur le \texttt{Board}.
 	\end{center}
 \end{figure}
 
-	\subsection{Détails de l'implémentation}
+	\subsection{Détails d'implémentation}
 Lors du développement de ce modèle de jeu, nous avons eu des difficultés quand aux structures de données à utiliser. L'utilisation du gestionnaire de version Git nous à permit de créer plusieurs versions plus ou moins stables du modèle. Dans un premier temps, nous avions décidé de placer les entités directement dans les cases du plateau de jeu. Cette méthode était très difficile à maintenir car les positions des entités étaient stockées dans des \texttt{HashMap}.
 
-Nous avons par la suite abandonné ce système pour réaliser une seconde implémentation du modèle. Dans cette dernière, nous avons gardés la structure des cases, c'est à dire quatre attributs correspondants au murs possibles. Un ensemble de méthode ont été créées pour générer des plateaux aléatoires. C'est sur cette version que sera basée la prochaine utilisant les algorithmes de résolution.
+Nous avons par la suite abandonné ce système pour réaliser une seconde implémentation du modèle. Dans cette dernière, nous avons gardés la structure des cases, c'est à dire quatre attributs correspondants au murs possibles mais les positions des cibles et robots sont directement contenues dans les cases. Un ensemble de méthode ont été créées pour générer des plateaux aléatoires. C'est sur cette version que sera basée la prochaine utilisant les algorithmes de résolution.
 
 \section{Méthodes de résolution}
 	Dans cette partie, nous allons voir les deux algorithmes utilisés pour la résolution du jeu. Il s'agit de l'algorithme \textsl{A*} et de \textsl{BFS} (Breadth First Search). Chaque méthode possède des avantages et des inconvénients que nous allons détailler ci-dessous.
 	
 	\subsection{Historique du projet}
-Durant le développement du projet, nous nous sommes tout d'abord penchés sur l'algorithme de résolution \textsl{A*}. Ce dernier possède un avantage théorique car il limite le nombre d'état possible grâce à une heuristique de plateau. L'implémentation de \textsl{A*} a nécessité l'utilisation de méthodes définies dans la classe \texttt{Board}. Cependant nous avons eu beaucoup de mal à trouver une heuristique cohérente permettant de trouver la solution. Après certaines recherches, nous avons décidés de se pencher sur l'algorithme \textsl{BFS}, ce dernier néglige la mémoire au profit de trouver une solution rapide. C'est cette méthode qui nous à donné le plus de résultats cohérents.
+Durant le développement du projet, nous nous sommes tout d'abord penchés sur l'algorithme de résolution \textsl{A*}. Ce dernier possède un avantage théorique car il limite le nombre d'états possibles grâce à une heuristique de plateau. L'implémentation de \textsl{A*} a nécessité l'utilisation des méthodes définies dans la classe \texttt{Board}. Cependant nous avons eu beaucoup de mal à trouver une heuristique cohérente permettant de trouver la solution. Après certaines recherches, nous avons décidés de se pencher sur l'algorithme \textsl{BFS}, ce dernier néglige la mémoire au profit de trouver une solution rapide. C'est cette méthode qui nous à donné le plus de résultats cohérents.
 
 Pour mettre en place ces résolutions, une dernière version du modèle à été mise en place, avec des entités robots et cibles qui possèdent leur propre position. Cela permet de les déplacer virtuellement sur le jeu tout en ne stockant que ces positions pour les différents états.
 
@@ -264,11 +262,22 @@ Le second algorithme nous a cependant permis de résoudre une partie du problèm
 Pour ouvrir sur d'autres possibilités, l'algorithme DFS (Deep First Searching) est une exploration en profondeur qui nécessite peu de mémoire au détriment du temps de résolution. Les branches sont explorées jusqu'au dernier nœud possible (avant de faire des mouvements arrières).
 
 \section{Fonctionnalités implémentées et architecture}
-	\subsection{Interface graphique}
+	\subsection{Interface graphique et utilisation}
 	Une interface graphique\up{\ref{interface}} permet de visualiser l'état d'un plateau de jeu. Le choix de la cible s'effectue via une liste déroulante, de même pour le robot colorié en rouge. Il est possible de déplacer le robot en cours dans la direction souhaitée par l'appui sur les flèches directionnelles.
 	Chaque action entraîne la mise à jour de l'interface graphique conformément à la structure MVC. Un message s'affiche lors de la résolution du jeu.
 	Des boutons permettent de lancer les algorithmes de recherche pour trouver une solution au problème actuel. C'est à dire pour permettre au robot de se rendre sur la cible.
-	La remise à zéro du plateau est un rechargement du fichier de configuration du jeu officiel.
+	
+Il y a deux possibilités, soit lancer l'algorithme \textsl{A*} et tenter un chemin direct sans utilisation des autres robots ou lancer l'algorithme \texttt{BFSSearch} pour trouver un chemin optimal en 6 coups maximum. Les résultats des algorithmes sont inscrits en console.
+	
+Avec \textsl{BFSSearch}, les directions sont indiquées mais avec \textsl{A*}, il faut partir de la fin de la ligne de résultat et jouer les coups en fonction des positions.
+
+Le bouton \textsl{Print Board} affiche dans le terminal la structure du plateau.
+
+Le bouton \textsl{Enregistrer plateau} est utilisé pour enregistrer un plateau courant, notamment utilisé après une génération de plateau aléatoire. Cette méthode enregistre le plateau dans un fichier nommé \texttt{board.txt} dans le dossier \texttt{dist}. Pour charger ce fichier lors du lancement d'une partie, il faut spécifier le nom du plateau à utiliser après dans la commande \texttt{sh scripts/run.sh board.txt}.
+	
+	Le bouton de création aléatoire de plateau génère un plateau suivant les règles définies, il est affiché directement dans l'interface graphique et il est jouable.
+	
+	Le bouton \texttt{Charger Plateau} correspond à la remise à zéro du plateau de jeu à partir du fichier initial de sa création.
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -304,6 +313,13 @@ Le fichier contenant les données de configuration d'un plateau de jeu est compo
 Par exemple, \textsl{0 0 W N R} donne pour la case en position $(0,0)$ un mur à l'Ouest, un mur au Nord et un Robot.
 
 Il est possible d'ajouter d'autres robots et de nouvelles cibles en ajoutant de nouvelles lignes de configuration. Elles peuvent être mélangées.
+
+	\subsection{Exécutables}
+Pour lancer le projet, il faut se placer à la racine du dossier \texttt{ricochet\_robot}. Les scripts contenus dans le dossier \texttt{scripts} permettent de lancer les différents exécutables du programme. L'interface graphique est lancée avec la commande  \texttt{sh  scripts/run.sh}, il est possible de rajouter le nom d'un fichier de configuration de plateau.
+
+Un second exécutable peut être lancé, il permet de résoudre un plateau de jeu entier. Une cible est tirée au sort et l'algorithme de résolution \textsl{BFSSearch} est lancé pour chaque robot. Les résultats sont affichés dans le terminal. 
+
+Les autres commandes relatives aux scripts sont détaillées dans le fichier \texttt{README.txt}.
 
 	\subsection{Architecture du projet}
 Voici l'architecture de notre projet :
@@ -371,7 +387,7 @@ Voici l'architecture de notre projet :
 			} }
 			child { node {Solver.java
 			} }
-			child { node {Start.java
+			child { node {Resolution.java
 			} }
 			child { node {BFSSearch.java
 			} }
@@ -384,49 +400,67 @@ Voici l'architecture de notre projet :
    			child { node {ModeleEcoutable.java
 			} }
    	}
-   		child { node {dist}    		 
-    		child { node {board.txt
-			} }
-    }}    	       	     
-    ;   
+    }
+    ;
 \end{tikzpicture}
 \end{center}
 \caption{Arborescence des dossiers}
 \end{figure}
-\pagebreak
 
 \section{Expérimentations}
-	\subsection{Comparaison du temps de calcul}
-	
-	
-Dans le cas de notre jeu la complexité a été très variable, ce qui est la cause du nombre d'information a traiter et aussi aux algorithmes de recherche.En effet  la complexité est un domaine de l'informatique qui étudie la quantité de ressources (temps, espace mémoire, etc.) dont a besoin un algorithme pour résoudre un problème algorithmique.Ici nous comparons a travers une courbe le temps que met les deux algorithmes a trouver la solution du jeu en fonction du nombre de mouvement a effectuer.	
-	\begin{figure}[h]
-	\begin{center}
-	\includegraphics[scale=0.37]{./images/time.png}
-	\caption{Courbe du temps d’exécution des algorithmes  en fonction du  nombre de mouvements pour les Algorithmes A* et BFS}
-	\end{center}
-\end{figure}
-\newline
-Au vu de cela nous pouvons noter que cette différence de temps d’exécution entre les deux algorithmes est en parti dû  à la différence du  nombres de nœuds explorés, et aux différences fondamentales des deux algorithmes.
-
-	
 	\subsection{Nombre de nœuds explorés}
-On a ici la courbe représentant le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme \textsl{BFS}. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme \textsl{BFS}. Le tableau suivant représente le nombre de nœuds moyens parcourus en fonction du nombre de mouvements des résolutions.En ce qui concerne l'algorithme A* on observe un très faible nombre de nœuds explorés par rapport aux nœuds explorés lors de l’exécution de l'algorithme \textsl{BFS} , ce qui est en effet dû a la différence de paramètres pris en compte , et donc à la différence qu'oppose ces deux algorithmes dans la recherche de la solution au jeu. 
+La figure \ref{explores} représente le nombre de nœuds explorés en fonction du nombre de mouvements effectués dans l'algorithme \textsl{BFS}. On observe a travers ces figures une évolution de façon exponentielle des valeurs des nœuds parcourus lors de la recherche de solution au cours de l’exécution de l'algorithme \textsl{BFS}. Le tableau suivant représente le nombre de nœuds moyens parcourus en fonction du nombre de mouvements des résolutions. En ce qui concerne l'algorithme A*, on observe un très faible nombre de nœuds explorés par rapport aux nœuds explorés lors de l’exécution de l'algorithme \textsl{BFS}. Notons cependant que ces chiffres ne sont pas vraiment comparables car A* ne prend pas en compte les autres robots.
 
-\begin{figure}[h]
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.4]{./images/node.png}
+	\includegraphics[scale=0.15]{./images/tabBFS.png}
+	\caption{Nombre de nœuds parcourus en fonction du  nombre de mouvements de résolution pour les algorithmes A* et BFS }\label{explores}
+\end{figure}
+
+	\subsection{Comparaison du temps de calcul}
+Dans le cas de notre jeu la complexité a été très variable, ce qui est la cause du nombre d'informations a traiter et aussi aux algorithmes de recherche. En effet  la complexité est un domaine de l'informatique qui étudie la quantité de ressources (temps, espace mémoire, etc.) dont a besoin un algorithme pour résoudre un problème algorithmique. Le temps de calcul demandé par les deux algorithmes pour la résolution du jeu correspond à la figure \ref{calcul}.
+
+\begin{figure}[htpb]
 	\begin{center}
-	\includegraphics[scale=0.37]{./images/node.png}
-	\caption{Courbe du nombre de nœuds en fonction du  nombre de mouvements pour les Algorithmes A* et BFS
-	 }
-	\end{center}
-	\begin{center}
-	\includegraphics[scale=0.14]{./images/tabBFS.png}
-	\caption{tableau du nombre de nœuds en fonction du  nombre de mouvements}
+	\includegraphics[scale=0.5]{./images/time.png}
+	\caption{Courbe du temps d’exécution des algorithmes  en fonction du  nombre de mouvements pour les algorithmes A* et BFS}\label{calcul}
 	\end{center}
 \end{figure}
 
+Nous pouvons voir que le temps d’exécution entre les deux algorithmes est en parti dû à la différence du  nombres de nœuds explorés. Plus il y a de cas à explorer, plus le temps demandé est important.
 
-\section{Conclusion}
+\section{Répartition du projet}
+Dans ce projet, nous sommes 4 membres. Nous avons travaillés en groupe en se repartissant les tâches. Nous avons également travaillés sur nos points forts pour faire avancer le projet le plus rapidement possible et avec qualité.
+Le tableau suivant donne une liste chronologique des évènements et la répartition des tâches, si un membre est sélectionné, il a participé aux recherches ou à la programmation de cet élément.
+
+\begin{table}[htpb]
+\centering
+\begin{tabular}{l|c|c|c|c|}
+                                                   & Alex       & Elie       & Yoann      & Brandon    \\
+Réflexions sur les structures de données           & \checkmark & \checkmark & \checkmark & \checkmark \\
+Préliminaires modèle du plateau de jeu             &            & \checkmark &            &            \\
+Modèle de jeu avec données dans le plateau         & \checkmark & \checkmark & \checkmark &            \\
+Premières méthodes utilitaires                     & \checkmark & \checkmark &            &            \\
+Génération d'un plateau aléatoire                  & \checkmark &            & \checkmark &            \\
+Seconde version du modèle, avec données séparées   & \checkmark & \checkmark & \checkmark &            \\
+Premières réflexions sur A*                        &            & \checkmark & \checkmark & \checkmark \\
+Interface graphique pour visualisation des données & \checkmark &            &            &            \\
+Premiers essais sur A* et méthodes utilitaires     &            & \checkmark & \checkmark &            \\
+Troisième version simplifiée du modèle de jeu      & \checkmark &            &            &            \\
+Lecture et écriture des données du plateau         & \checkmark &            &            &            \\
+Essais méthodes meilleurs noeuds et noeuds voisins &            & \checkmark & \checkmark &            \\
+Clarification de A*, interface Comparable          & \checkmark &            &            &            \\
+Ajout algorihme BFS                                & \checkmark &            &            &            \\
+Corrections générales                              &            & \checkmark & \checkmark &            \\
+Finalisation de l'interface graphique              & \checkmark & \checkmark & \checkmark &            \\
+Rapport                                            & \checkmark & \checkmark & \checkmark &            \\
+Présentation soutenance                            &            & \checkmark &            &           
+\end{tabular}
+\end{table}
+
+\pagebreak
+\section*{Conclusion}
 Ce projet à été très formateur pour l'ensemble du groupe, nous avons pu découvrir certaines pratiques algorithmiques intéressantes. La gestion du projet avec une succession de versions permet à chacun d'essayer certaines méthodes sans impacter le tronc commun. La question de l'heuristique dans des graphes est complexe et nécessite de l'expérience. De plus, ce projet est perfectible, par une série d'améliorations possible :
 \begin{itemize}
 \item Mise en place d'un timer de jeu pour limiter le temps de résolution à la fois pour un joueur humain et pour les algorithmes.
